@@ -1,0 +1,953 @@
+{
+  "CZX": {
+    "domestic": {
+      "CAN": {
+        "price": 400,
+        "old_price": 330,
+        "flight_no": "CZ3994",
+        "dep_time": "07:05",
+        "status": "ok"
+      },
+      "CTU": {
+        "price": 400,
+        "old_price": 310,
+        "flight_no": "MU2935",
+        "dep_time": "13:00",
+        "status": "ok"
+      },
+      "CKG": {
+        "price": 380,
+        "old_price": 380,
+        "flight_no": "MU2903",
+        "dep_time": "7:05",
+        "status": "ok"
+      },
+      "KMG": {
+        "price": 458,
+        "old_price": 300,
+        "flight_no": "KY3224",
+        "dep_time": "13:20",
+        "status": "ok"
+      },
+      "XIY": {
+        "price": 368,
+        "old_price": 310,
+        "flight_no": "MU2971",
+        "dep_time": "07:05",
+        "status": "ok"
+      },
+      "HGH": {
+        "price": 128,
+        "old_price": 120,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "WUH": {
+        "price": 314,
+        "old_price": 400,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "DLC": {
+        "price": 278,
+        "old_price": 208,
+        "flight_no": "9C6832",
+        "dep_time": "16:45",
+        "status": "ok"
+      },
+      "TAO": {
+        "price": 260,
+        "old_price": 300,
+        "flight_no": "SC4800",
+        "dep_time": "09:55",
+        "status": "ok"
+      },
+      "CSY": {
+        "price": 320,
+        "old_price": 370,
+        "flight_no": "MU2977",
+        "dep_time": "13:35",
+        "status": "ok"
+      },
+      "HAK": {
+        "price": 550,
+        "old_price": 520,
+        "flight_no": "ZH9749",
+        "dep_time": "18:45",
+        "status": "ok"
+      },
+      "TSN": {
+        "price": 320,
+        "old_price": 400,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "TNA": {
+        "price": 400,
+        "old_price": 287,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "CGO": {
+        "price": 287,
+        "old_price": 300,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "XMN": {
+        "price": 300,
+        "old_price": 250,
+        "flight_no": "SC2102",
+        "dep_time": "22:10",
+        "status": "ok"
+      },
+      "FOC": {
+        "price": 330,
+        "old_price": 328,
+        "flight_no": "MF8074",
+        "dep_time": "17:45",
+        "status": "ok"
+      },
+      "KWE": {
+        "price": 507,
+        "old_price": 400,
+        "flight_no": "SC4799",
+        "dep_time": "15:20",
+        "status": "ok"
+      },
+      "LHW": {
+        "price": 269,
+        "old_price": 268,
+        "flight_no": "9C6362",
+        "dep_time": "11:30",
+        "status": "ok"
+      },
+      "SHE": {
+        "price": 259,
+        "old_price": 217,
+        "flight_no": "9C6174",
+        "dep_time": "22:40",
+        "status": "ok"
+      },
+      "INC": {
+        "price": 400,
+        "old_price": 850,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "failed_keep_old"
+      }
+    },
+    "intl": {
+      "ICN": {
+        "price": 784,
+        "old_price": 846,
+        "flight_no": "MF8074",
+        "dep_time": "07:15",
+        "status": "ok"
+      },
+      "BKK": {
+        "price": 733,
+        "old_price": 733,
+        "flight_no": "SC4800",
+        "dep_time": "07:20",
+        "status": "ok"
+      },
+      "SGN": {
+        "price": 270,
+        "old_price": 885,
+        "flight_no": "CZ3908",
+        "dep_time": "07:20",
+        "status": "ok"
+      },
+      "HKG": {
+        "price": 373,
+        "old_price": 823,
+        "flight_no": "UO273",
+        "dep_time": "21:00",
+        "status": "ok"
+      },
+      "MFM": {
+        "price": 296,
+        "old_price": 824,
+        "flight_no": "MU2851",
+        "dep_time": "16:20",
+        "status": "ok"
+      }
+    }
+  },
+  "WUX": {
+    "domestic": {
+      "PEK": {
+        "price": 360,
+        "old_price": 400,
+        "flight_no": "MU2949",
+        "dep_time": "13:45",
+        "status": "ok"
+      },
+      "CAN": {
+        "price": 329,
+        "old_price": 279,
+        "flight_no": "AQ1060",
+        "dep_time": "09:30",
+        "status": "ok"
+      },
+      "CTU": {
+        "price": 410,
+        "old_price": 450,
+        "flight_no": "MU2825",
+        "dep_time": "19:50",
+        "status": "ok"
+      },
+      "CKG": {
+        "price": 450,
+        "old_price": 410,
+        "flight_no": "ZH9551",
+        "dep_time": "07:05",
+        "status": "ok"
+      },
+      "KMG": {
+        "price": 330,
+        "old_price": 320,
+        "flight_no": "8L9600",
+        "dep_time": "20:50",
+        "status": "ok"
+      },
+      "XIY": {
+        "price": 380,
+        "old_price": 370,
+        "flight_no": "MU2709",
+        "dep_time": "17:05",
+        "status": "ok"
+      },
+      "HGH": {
+        "price": 120,
+        "old_price": 120,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "NKG": {
+        "price": 120,
+        "old_price": 112,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "WUH": {
+        "price": 388,
+        "old_price": 380,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "DLC": {
+        "price": 340,
+        "old_price": 320,
+        "flight_no": "MU2837",
+        "dep_time": "11:10",
+        "status": "ok"
+      },
+      "SYX": {
+        "price": 598,
+        "old_price": 590,
+        "flight_no": "MU2733",
+        "dep_time": "10:45",
+        "status": "ok"
+      },
+      "TAO": {
+        "price": 290,
+        "old_price": 290,
+        "flight_no": "MU2701",
+        "dep_time": "07:20",
+        "status": "ok"
+      },
+      "SZX": {
+        "price": 600,
+        "old_price": 450,
+        "flight_no": "ZH9808",
+        "dep_time": "21:55",
+        "status": "ok"
+      },
+      "CSY": {
+        "price": 320,
+        "old_price": 350,
+        "flight_no": "HO2007",
+        "dep_time": "20:20",
+        "status": "ok"
+      },
+      "TSN": {
+        "price": 420,
+        "old_price": 380,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "TNA": {
+        "price": 400,
+        "old_price": 400,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "CGO": {
+        "price": 328,
+        "old_price": 380,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "XMN": {
+        "price": 370,
+        "old_price": 370,
+        "flight_no": "MU2979",
+        "dep_time": "19:00",
+        "status": "ok"
+      },
+      "FOC": {
+        "price": 350,
+        "old_price": 360,
+        "flight_no": "MF8538",
+        "dep_time": "10:30",
+        "status": "ok"
+      },
+      "KWL": {
+        "price": 496,
+        "old_price": 482,
+        "flight_no": "HO2013",
+        "dep_time": "13:40",
+        "status": "ok"
+      },
+      "KWE": {
+        "price": 479,
+        "old_price": 430,
+        "flight_no": "AQ1332",
+        "dep_time": "17:00",
+        "status": "ok"
+      },
+      "SHE": {
+        "price": 349,
+        "old_price": 349,
+        "flight_no": "AQ1331",
+        "dep_time": "15:15",
+        "status": "ok"
+      },
+      "LXA": {
+        "price": 1800,
+        "old_price": 2800,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      }
+    },
+    "intl": {
+      "ICN": {
+        "price": 784,
+        "old_price": 784,
+        "flight_no": "MF8538",
+        "dep_time": "15:30",
+        "status": "ok"
+      },
+      "BKK": {
+        "price": 727,
+        "old_price": 965,
+        "flight_no": "ZH9541",
+        "dep_time": "14:30",
+        "status": "ok"
+      },
+      "SIN": {
+        "price": 982,
+        "old_price": 2588,
+        "flight_no": "ZH9814",
+        "dep_time": "21:30",
+        "status": "ok"
+      },
+      "KUL": {
+        "price": 1839,
+        "old_price": 880,
+        "flight_no": "ZH9814",
+        "dep_time": "12:40",
+        "status": "ok"
+      },
+      "SGN": {
+        "price": 885,
+        "old_price": 909,
+        "flight_no": "CZ3914",
+        "dep_time": "22:25",
+        "status": "ok"
+      },
+      "TPE": {
+        "price": 1360,
+        "old_price": 986,
+        "flight_no": "CX5215",
+        "dep_time": "19:45",
+        "status": "ok"
+      },
+      "MFM": {
+        "price": 726,
+        "old_price": 747,
+        "flight_no": "MU1082",
+        "dep_time": "05:30",
+        "status": "ok"
+      }
+    }
+  },
+  "SHA": {
+    "domestic": {
+      "PEK": {
+        "price": 450,
+        "old_price": 400,
+        "flight_no": "MU5159",
+        "dep_time": "14:30",
+        "status": "ok"
+      },
+      "CAN": {
+        "price": 298,
+        "old_price": 258,
+        "flight_no": "9C8929",
+        "dep_time": "21:20",
+        "status": "ok"
+      },
+      "CTU": {
+        "price": 498,
+        "old_price": 479,
+        "flight_no": "9C6101",
+        "dep_time": "07:50",
+        "status": "ok"
+      },
+      "CKG": {
+        "price": 508,
+        "old_price": 388,
+        "flight_no": "9C8897",
+        "dep_time": "16:05",
+        "status": "ok"
+      },
+      "KMG": {
+        "price": 388,
+        "old_price": 298,
+        "flight_no": "9C8953",
+        "dep_time": "07:55",
+        "status": "ok"
+      },
+      "XIY": {
+        "price": 348,
+        "old_price": 348,
+        "flight_no": "9C8945",
+        "dep_time": "23:00",
+        "status": "ok"
+      },
+      "HGH": {
+        "price": 123,
+        "old_price": 800,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "failed_keep_old"
+      },
+      "NKG": {
+        "price": 145,
+        "old_price": 144,
+        "flight_no": "",
+        "dep_time": "",
+        "status": "ok"
+      },
+      "WUH": {
+        "price": 340,
+        "old_price": 350,
+        "flight_no": "MU2510",
+        "dep_time": "07:25",
+        "status": "ok"
+      },
+      "SYX": {
+        "price": 500,
+        "old_price": 500,
+        "flight_no": "HO1127",
+        "dep_time": "16:20",
+        "status": "ok"
+      },
+      "TAO": {
+        "price": 280,
+        "old_price": 360,
+        "flight_no": "SC4656",
+        "dep_time": "7:15",
+        "status": "ok"
+      },
+      "SZX": {
+        "price": 598,
+        "old_price": 408,
+        "flight_no": "9C8881",
+        "dep_time": "06:40",
+        "status": "ok"
+      },
+      "CSY": {
+        "price": 318,
+        "old_price": 368,
+        "flight_no": "HO1085",
+        "dep_time": "22:15",
+        "status": "ok"
+      },
+      "HAK": {
+        "price": 523,
+        "old_price": 518,
+        "flight_no": "FM9269",
+        "dep_time": "08:50",
+        "status": "ok"
+      },
+      "TSN": {
+        "price": 645,
+        "old_price": 495,
+        "flight_no": "CA2824",
+        "dep_time": "19:40",
+        "status": "ok"
+      },
+      "TNA": {
+        "price": 367,
+        "old_price": 368,
+        "flight_no": "MU5571",
+        "dep_time": "06:55",
+        "status": "ok"
+      },
+      "CGO": {
+        "price": 462,
+        "old_price": 390,
+        "flight_no": "FM9321",
+        "dep_time": "17:15",
+        "status": "ok"
+      },
+      "XMN": {
+        "price": 288,
+        "old_price": 198,
+        "flight_no": "9C8807",
+        "dep_time": "07:15",
+        "status": "ok"
+      },
+      "FOC": {
+        "price": 290,
+        "old_price": 300,
+        "flight_no": "FM9265",
+        "dep_time": "07:00",
+        "status": "ok"
+      },
+      "KWL": {
+        "price": 388,
+        "old_price": 388,
+        "flight_no": "HO1147",
+        "dep_time": "06:55",
+        "status": "ok"
+      },
+      "KWE": {
+        "price": 400,
+        "old_price": 400,
+        "flight_no": "CZ8264",
+        "dep_time": "22:00",
+        "status": "ok"
+      },
+      "LHW": {
+        "price": 513,
+        "old_price": 644,
+        "flight_no": "MU6813",
+        "dep_time": "21:35",
+        "status": "ok"
+      },
+      "HRB": {
+        "price": 718,
+        "old_price": 718,
+        "flight_no": "MU5617",
+        "dep_time": "15:20",
+        "status": "ok"
+      },
+      "HET": {
+        "price": 513,
+        "old_price": 516,
+        "flight_no": "MU5459",
+        "dep_time": "",
+        "status": "ok"
+      }
+    },
+    "intl": {
+      "ICN": {
+        "price": 1275,
+        "old_price": 883,
+        "flight_no": "MF8542",
+        "dep_time": "08:05",
+        "status": "ok"
+      },
+      "TPE": {
+        "price": 1110,
+        "old_price": 673,
+        "flight_no": "CX327",
+        "dep_time": "22:30",
+        "status": "ok"
+      },
+      "MFM": {
+        "price": 410,
+        "old_price": 579,
+        "flight_no": "9C8875",
+        "dep_time": "09:15",
+        "status": "ok"
+      }
+    }
+  },
+  "PVG": {
+    "domestic": {
+      "PEK": {
+        "price": 400,
+        "old_price": 400,
+        "flight_no": "KN5978",
+        "dep_time": "06:55",
+        "status": "ok"
+      },
+      "CAN": {
+        "price": 269,
+        "old_price": 269,
+        "flight_no": "AQ1006",
+        "dep_time": "23:10",
+        "status": "ok"
+      },
+      "CTU": {
+        "price": 479,
+        "old_price": 400,
+        "flight_no": "EU6678",
+        "dep_time": "07:20",
+        "status": "ok"
+      },
+      "CKG": {
+        "price": 298,
+        "old_price": 348,
+        "flight_no": "9C8867",
+        "dep_time": "18:05",
+        "status": "ok"
+      },
+      "KMG": {
+        "price": 416,
+        "old_price": 348,
+        "flight_no": "HO1017",
+        "dep_time": "17:35",
+        "status": "ok"
+      },
+      "XIY": {
+        "price": 340,
+        "old_price": 320,
+        "flight_no": "CZ5791",
+        "dep_time": "06:25",
+        "status": "ok"
+      },
+      "HGH": {
+        "price": 290,
+        "old_price": 288,
+        "flight_no": "MU6549",
+        "dep_time": "23:30",
+        "status": "ok"
+      },
+      "NKG": {
+        "price": 289,
+        "old_price": 288,
+        "flight_no": "MU7728",
+        "dep_time": "09:40",
+        "status": "ok"
+      },
+      "WUH": {
+        "price": 258,
+        "old_price": 288,
+        "flight_no": "HO1145",
+        "dep_time": "06:50",
+        "status": "ok"
+      },
+      "DLC": {
+        "price": 259,
+        "old_price": 318,
+        "flight_no": "9C8981",
+        "dep_time": "12:55",
+        "status": "ok"
+      },
+      "SYX": {
+        "price": 398,
+        "old_price": 398,
+        "flight_no": "9C8779",
+        "dep_time": "22:00",
+        "status": "ok"
+      },
+      "TAO": {
+        "price": 258,
+        "old_price": 290,
+        "flight_no": "HO2203",
+        "dep_time": "22:05",
+        "status": "ok"
+      },
+      "SZX": {
+        "price": 400,
+        "old_price": 400,
+        "flight_no": "CA1893",
+        "dep_time": "07:30",
+        "status": "ok"
+      },
+      "CSY": {
+        "price": 300,
+        "old_price": 340,
+        "flight_no": "HU7758",
+        "dep_time": "23:05",
+        "status": "ok"
+      },
+      "HAK": {
+        "price": 400,
+        "old_price": 400,
+        "flight_no": "HO1271",
+        "dep_time": "07:45",
+        "status": "ok"
+      },
+      "TSN": {
+        "price": 347,
+        "old_price": 350,
+        "flight_no": "BK3176",
+        "dep_time": "06:45",
+        "status": "ok"
+      },
+      "TNA": {
+        "price": 367,
+        "old_price": 364,
+        "flight_no": "MU5533",
+        "dep_time": "23:25",
+        "status": "ok"
+      },
+      "CGO": {
+        "price": 290,
+        "old_price": 338,
+        "flight_no": "Y87519",
+        "dep_time": "14:10",
+        "status": "ok"
+      },
+      "XMN": {
+        "price": 288,
+        "old_price": 370,
+        "flight_no": "9C8805",
+        "dep_time": "07:00",
+        "status": "ok"
+      },
+      "FOC": {
+        "price": 333,
+        "old_price": 333,
+        "flight_no": "MU5505",
+        "dep_time": "08:35",
+        "status": "ok"
+      },
+      "KWL": {
+        "price": 350,
+        "old_price": 358,
+        "flight_no": "HO2263",
+        "dep_time": "07:40",
+        "status": "ok"
+      },
+      "KWE": {
+        "price": 360,
+        "old_price": 350,
+        "flight_no": "MU8509",
+        "dep_time": "06:40",
+        "status": "ok"
+      },
+      "LHW": {
+        "price": 388,
+        "old_price": 388,
+        "flight_no": "9C6487",
+        "dep_time": "07:30",
+        "status": "ok"
+      },
+      "HRB": {
+        "price": 535,
+        "old_price": 398,
+        "flight_no": "CA8301",
+        "dep_time": "07:10",
+        "status": "ok"
+      },
+      "SHE": {
+        "price": 288,
+        "old_price": 288,
+        "flight_no": "9C7021",
+        "dep_time": "06:35",
+        "status": "ok"
+      },
+      "INC": {
+        "price": 500,
+        "old_price": 400,
+        "flight_no": "GJ8559",
+        "dep_time": "06:20",
+        "status": "ok"
+      },
+      "HET": {
+        "price": 443,
+        "old_price": 360,
+        "flight_no": "MU6357",
+        "dep_time": "14:00",
+        "status": "ok"
+      }
+    },
+    "intl": {
+      "ICN": {
+        "price": 806,
+        "old_price": 645,
+        "flight_no": "ZE872",
+        "dep_time": "09:10",
+        "status": "ok"
+      },
+      "SIN": {
+        "price": 919,
+        "old_price": 919,
+        "flight_no": "3U6992",
+        "dep_time": "16:50",
+        "status": "ok"
+      },
+      "KUL": {
+        "price": 1071,
+        "old_price": 697,
+        "flight_no": "VJ7239",
+        "dep_time": "02:20",
+        "status": "ok"
+      },
+      "DPS": {
+        "price": 1989,
+        "old_price": 1897,
+        "flight_no": "OD617",
+        "dep_time": "02:20",
+        "status": "ok"
+      },
+      "HKG": {
+        "price": 648,
+        "old_price": 580,
+        "flight_no": "CX303",
+        "dep_time": "07:20",
+        "status": "ok"
+      },
+      "TPE": {
+        "price": 1110,
+        "old_price": 673,
+        "flight_no": "CX303",
+        "dep_time": "07:20",
+        "status": "ok"
+      },
+      "MFM": {
+        "price": 410,
+        "old_price": 500,
+        "flight_no": "9C8875",
+        "dep_time": "07:55",
+        "status": "ok"
+      }
+    }
+  },
+  "_boomerang_legs": {
+    "PVG-CAN": {
+      "price": 280,
+      "flight_no": "AQ1006",
+      "dep_time": "23:10",
+      "status": "ok",
+      "source": "verified"
+    },
+    "CAN-SHA": {
+      "price": 469,
+      "flight_no": "9C6722",
+      "dep_time": "06:45",
+      "status": "ok",
+      "source": "verified"
+    },
+    "WUX-CAN": {
+      "price": 489,
+      "flight_no": "AQ1056",
+      "dep_time": "16:20",
+      "status": "ok",
+      "source": "verified"
+    },
+    "SHA-KMG": {
+      "price": 299,
+      "flight_no": "9C8953",
+      "dep_time": "07:45",
+      "status": "ok",
+      "source": "verified"
+    },
+    "KMG-CKG": {
+      "price": 330,
+      "flight_no": "CZ2120",
+      "dep_time": "22:05",
+      "status": "ok",
+      "source": "verified"
+    },
+    "CKG-CZX": {
+      "price": 420,
+      "flight_no": "3U8097",
+      "dep_time": "06:50",
+      "status": "ok",
+      "source": "verified"
+    },
+    "CAN-CKG": {
+      "price": 550,
+      "flight_no": "CZ9098",
+      "dep_time": "06:55",
+      "status": "ok",
+      "source": "verified"
+    },
+    "CKG-PVG": {
+      "price": 515,
+      "flight_no": "9C6154",
+      "dep_time": "05:40",
+      "status": "ok",
+      "source": "verified"
+    },
+    "CZX-KMG": {
+      "price": 678,
+      "flight_no": "KY3224",
+      "dep_time": "20:40",
+      "status": "ok",
+      "source": "verified"
+    }
+  },
+  "_boomerang_totals": {
+    "T2_2": {
+      "name": "浦东·岭南虹桥线",
+      "legs": {
+        "PVG-CAN": {},
+        "CAN-SHA": {}
+      },
+      "type": "domestic_2",
+      "total": 749
+    },
+    "T2_3": {
+      "name": "无锡·岭南快线",
+      "legs": {
+        "WUX-CAN": {},
+        "CAN-SHA": {}
+      },
+      "type": "domestic_2",
+      "total": 958
+    },
+    "SHA": {
+      "name": "虹桥·西南穿越",
+      "legs": {
+        "SHA-KMG": {},
+        "KMG-CKG": {},
+        "CKG-CZX": {}
+      },
+      "type": "domestic_3",
+      "total": 1049
+    },
+    "PVG": {
+      "name": "浦东·岭南环线",
+      "legs": {
+        "PVG-CAN": {},
+        "CAN-CKG": {},
+        "CKG-PVG": {}
+      },
+      "type": "domestic_3",
+      "total": 1345
+    },
+    "CZX": {
+      "name": "常州·西南三角",
+      "legs": {
+        "CZX-KMG": {},
+        "KMG-CKG": {},
+        "CKG-CZX": {}
+      },
+      "type": "domestic_3",
+      "total": 1428
+    }
+  }
+}

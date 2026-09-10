@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>长三角全球特价航班速查 - 2026年9月</title>
+<meta name="description" content="长三角四场出发全球特价航班速查，集成TripNow实时票价、飞常准航班时刻、高德地图机场交通">
+<style>
+
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #eeeeee;
+  --gold: #b8860b;
+  --gold-dark: #9a7200;
+  --blue-accent: #1565c0;
+  --green: #2e7d32;
+  --text-primary: #1a1a2e;
+  --text-secondary: #546e7a;
+  --text-muted: #78909c;
+  --border: #d0d7e2;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.08);
+  --header-bg: #2C3E6B;
+  --header-text-glow: linear-gradient(135deg, #ffd740 0%, #ffab00 100%);
+  --header-border: #1E2D52;
+}
+[data-theme="dark"] {
+  --bg-primary: #000000;
+  --bg-secondary: #111111;
+  --bg-card: #1a1a1a;
+  --bg-card-hover: #222222;
+  --gold: #ffd740;
+  --gold-dark: #c7a500;
+  --blue-accent: #448aff;
+  --green: #00e676;
+  --text-primary: #e8eaf6;
+  --text-secondary: #90a4ae;
+  --text-muted: #607d8b;
+  --border: #333333;
+  --shadow-card: none;
+  --header-bg: #000000;
+  --header-text-glow: linear-gradient(135deg, var(--gold) 0%, #ffab00 100%);
+  --header-border: #333333;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-primary: #000000;
+    --bg-secondary: #111111;
+    --bg-card: #1a1a1a;
+    --bg-card-hover: #222222;
+    --gold: #ffd740;
+    --gold-dark: #c7a500;
+    --blue-accent: #448aff;
+    --green: #00e676;
+    --text-primary: #e8eaf6;
+    --text-secondary: #90a4ae;
+    --text-muted: #607d8b;
+    --border: #333333;
+    --shadow-card: none;
+    --header-bg: #000000;
+    --header-border: #333333;
+  }
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background-color 0.3s, color 0.3s;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+
+/* Header */
+.header {
+  background: var(--header-bg);
+  padding: 24px 0;
+  border-bottom: 2px solid var(--header-border);
+  position: sticky; top: 0; z-index: 100;
+  transition: background 0.3s;
+}
+.header h1 {
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--gold) 0%, #ffab00 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-meta {
+  display: flex; gap: 16px; flex-wrap: wrap;
+  font-size: 0.8rem; color: rgba(255,255,255,0.9); margin-top: 6px;
+}
+.header-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* Airport Tabs */
+.airport-tabs {
+  display: flex; gap: 4px; padding: 12px 0;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid var(--border);
+}
+.ap-tab {
+  padding: 10px 20px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: var(--bg-secondary); color: var(--text-secondary);
+  border: 1px solid var(--border); border-bottom: none;
+  cursor: pointer; white-space: nowrap; font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.ap-tab:hover { background: var(--bg-card); color: var(--text-primary); }
+.ap-tab.active {
+  background: var(--bg-card); color: var(--gold);
+  border-color: var(--gold-dark); font-weight: 600;
+}
+
+/* Search & Filters */
+.search-bar { padding: 16px 0; }
+.search-bar input {
+  width: 100%; padding: 12px 16px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--bg-secondary);
+  color: var(--text-primary); font-size: 1rem; outline: none;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+.search-bar input:focus { border-color: var(--blue-accent); }
+.search-bar input::placeholder { color: var(--text-muted); }
+
+.region-filters {
+  display: flex; gap: 6px; flex-wrap: wrap; padding-bottom: 12px;
+}
+.region-btn {
+  padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--bg-secondary); color: var(--text-secondary);
+  cursor: pointer; font-size: 0.8rem; transition: all 0.2s;
+}
+.region-btn:hover { border-color: var(--blue-accent); color: var(--text-primary); }
+.region-btn.active { background: var(--blue-accent); color: #fff; border-color: var(--blue-accent); }
+
+/* Region Section */
+.region-section { margin-bottom: 24px; }
+.region-title {
+  font-size: 1.1rem; color: var(--gold);
+  padding: 8px 0; border-bottom: 1px solid var(--border); margin-bottom: 12px;
+}
+
+/* Cards Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+/* Destination Card */
+.dest-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow-card);
+  transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+.dest-card { cursor: pointer; }
+.dest-card:hover { background: var(--bg-card-hover); border-color: var(--blue-accent); transform: translateY(-2px); }
+
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; }
+.card-left { display: flex; align-items: center; gap: 10px; }
+.dest-flag { font-size: 1.8rem; }
+.dest-city { font-size: 1rem; font-weight: 600; }
+.dest-code { font-size: 0.75rem; color: var(--text-muted); }
+
+.card-right { text-align: right; }
+.price-area { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.price-badge {
+  font-size: 1.2rem; font-weight: 700; padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+.price-badge.no-price { background: var(--bg-secondary); color: var(--text-muted); font-size: 0.85rem; }
+.price-label { font-size: 0.65rem; }
+
+.direct-badge {
+  display: inline-block; font-size: 0.7rem; padding: 2px 8px;
+  border-radius: 10px; background: #1b5e2020; color: var(--green); margin-top: 4px;
+}
+.direct-badge.transfer { background: #e6510020; color: #ff9800; }
+
+.flight-line{font-size:15px;font-weight:600;color:var(--blue-accent);margin:10px 0 6px;padding:4px 0;letter-spacing:.3px}
+
+.card-meta {
+  display: flex; gap: 12px; font-size: 0.75rem; color: var(--text-muted);
+  margin: 4px 0;
+}
+
+.card-actions { display: flex; gap: 8px; margin-top: 10px; }
+.btn-book {
+  padding: 6px 16px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #1565c0, #1976d2);
+  color: #fff; text-decoration: none; font-size: 0.8rem; font-weight: 600;
+  transition: all 0.2s;
+}
+.btn-book:hover { background: linear-gradient(135deg, #1976d2, #2196f3); }
+
+/* Detail Panel */
+.detail-panel {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.detail-panel h4 { font-size: 0.9rem; margin-bottom: 8px; color: var(--text-primary); }
+.detail-panel h4 small { color: var(--text-muted); font-weight: normal; }
+.table-wrap { overflow-x: auto; }
+.flight-table {
+  width: 100%; border-collapse: collapse; font-size: 0.75rem;
+}
+.flight-table th {
+  background: var(--bg-secondary); padding: 6px 8px;
+  text-align: left; color: var(--text-secondary); font-weight: 600;
+  position: sticky; top: 0;
+}
+.flight-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.flight-table tr:hover td { background: var(--bg-secondary); }
+
+/* Transport Section */
+.transport-section {
+  margin-top: 32px; padding: 20px;
+  background: var(--bg-secondary); border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.transport-title { color: var(--gold); margin-bottom: 16px; font-size: 1.1rem; }
+.transport-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.transport-card {
+  background: var(--bg-card); padding: 16px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.transport-card h4 { margin-bottom: 10px; font-size: 0.95rem; }
+.transport-info { font-size: 0.85rem; line-height: 2; }
+.transport-info strong { color: var(--gold); }
+.nav-btn {
+  display: inline-block; margin-top: 10px; padding: 8px 16px;
+  background: #1b5e20; color: #fff; border-radius: var(--radius-sm);
+  text-decoration: none; font-size: 0.85rem;
+}
+.nav-btn:hover { background: #2e7d32; }
+
+.transit-option {
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+.transit-option:last-child { border-bottom: none; }
+.transit-header {
+  display: flex; gap: 12px; align-items: center; font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+.transit-idx {
+  background: var(--blue-accent); color: #fff; padding: 2px 8px;
+  border-radius: 10px; font-size: 0.7rem;
+}
+.transit-steps { font-size: 0.75rem; color: var(--text-secondary); word-break: break-all; }
+
+/* Boomerang */
+.boomerang-intro { padding: 20px 0; text-align: center; }
+.boomerang-intro h2 { color: var(--gold); margin-bottom: 8px; }
+.boomerang-intro p { color: var(--text-secondary); }
+.boomerang-routes { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding-bottom: 40px; }
+.boomerang-card {
+  cursor: pointer;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+}
+.boomerang-card h3 { color: var(--gold); margin-bottom: 12px; font-size: 1.1rem; }
+.route-path {
+  font-size: 0.9rem; color: var(--blue-accent); padding: 8px;
+  background: var(--bg-secondary); border-radius: var(--radius-sm); margin-bottom: 12px;
+}
+.route-info {
+  display: flex; gap: 16px; font-size: 0.85rem; margin-bottom: 12px;
+  color: var(--text-secondary);
+}
+.route-price { color: var(--gold); font-weight: 700; font-size: 1rem; }
+.route-flights {
+  font-size: 0.8rem; color: var(--text-secondary); line-height: 2;
+  margin-bottom: 12px;
+}
+.btn-book-lg {
+  display: inline-block; padding: 10px 24px; border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #e65100, #f57c00);
+  color: #fff; text-decoration: none; font-weight: 600; font-size: 0.9rem;
+}
+.btn-book-lg:hover { background: linear-gradient(135deg, #f57c00, #ff9800); }
+
+/* Footer */
+.footer {
+  text-align: center; padding: 24px; font-size: 0.75rem;
+  color: var(--text-muted); border-top: 1px solid var(--border);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header h1 { font-size: 1.2rem; }
+  .cards-grid { grid-template-columns: 1fr; }
+  .transport-grid { grid-template-columns: 1fr; }
+  .boomerang-routes { grid-template-columns: 1fr; }
+  .ap-tab { padding: 8px 14px; font-size: 0.8rem; }
+}
+@media (max-width: 480px) {
+  .header-meta { flex-direction: column; gap: 4px; }
+  .card-header { flex-direction: column; gap: 8px; }
+  .card-right { text-align: left; }
+}
+
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+.ap-tab:focus-visible, .region-btn:focus-visible, .btn-book:focus-visible, .nav-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media print { .airport-tabs,.search-bar,.region-filters,.card-actions,.btn-book,.nav-btn { display:none!important; } .airport-tab-content { display:block!important; } #flightModal { display:none!important; } body { background:#fff; color:#000; } }
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  position: fixed; top: 20px; right: 20px; z-index: 200;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid rgba(255,215,64,0.3);
+  background: rgba(0,0,0,0.5); color: #ffd740;
+  font-size: 1.2rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  transition: transform 0.2s, background-color 0.3s, border-color 0.3s;
+  padding: 0; line-height: 1;
+}
+.theme-toggle-btn:hover { transform: scale(1.12); background: rgba(0,0,0,0.65); }
+[data-theme="light"] .theme-toggle-btn { background: rgba(255,255,255,0.85); color: #1a1a2e; border-color: rgba(0,0,0,0.15); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+[data-theme="light"] .theme-toggle-btn:hover { background: rgba(255,255,255,0.95); }
+/* Light mode specific overrides */
+[data-theme="light"] .dest-card { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+[data-theme="light"] .transport-section { background: var(--bg-secondary); }
+[data-theme="light"] .boomerang-card { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+[data-theme="light"] .btn-book { background: linear-gradient(135deg, #1565c0, #1976d2); }
+[data-theme="light"] .nav-btn { background: #2e7d32; }
+[data-theme="light"] .price-badge { background: rgba(184,134,11,0.12) !important; }
+[data-theme="light"] .direct-badge { background: rgba(46,125,50,0.1); }
+[data-theme="light"] .direct-badge.transfer { background: rgba(230,81,0,0.1); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dest-card { box-shadow: none; } }
+
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease}
+.modal-overlay.active{opacity:1;visibility:visible}
+.modal-dialog{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);max-width:800px;width:92%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.25);transform:scale(.92);opacity:0;transition:transform .25s ease,opacity .25s ease}
+.modal-overlay.active .modal-dialog{transform:scale(1);opacity:1}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-title{font-size:1.15rem;font-weight:700;color:var(--gold)}
+.modal-title small{font-weight:400;color:var(--text-muted);font-size:.85rem;margin-left:6px}
+.modal-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{background:#e5393520;color:#e53935;border-color:#e53935}
+.modal-body{padding:16px 20px;overflow-y:auto;flex:1}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;flex-shrink:0}
+.modal-footer .btn-book{padding:10px 28px;font-size:.95rem;border-radius:var(--radius-sm)}
+
+.boomerang-subtabs{display:flex;justify-content:center;gap:12px;margin:16px 0 12px}
+.boom-subtab{padding:10px 24px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);cursor:pointer;font-size:.95rem;font-weight:600;transition:all .25s}
+.boom-subtab.active{background:linear-gradient(135deg,var(--gold),#f57c00);color:#fff;border-color:var(--gold)}
+.boom-subtab:hover:not(.active){background:var(--bg-secondary)}
+.boom-airport-filter{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:20px;padding:0 10px}
+.boom-ap-btn{padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:.82rem;transition:all .2s}
+.boom-ap-btn.active{color:#fff;border-color:transparent}
+.boom-ap-btn[data-ap="all"].active{background:#607d8b}
+.boom-ap-btn[data-ap="CZX"].active{background:#e91e63}
+.boom-ap-btn[data-ap="WUX"].active{background:#2196f3}
+.boom-ap-btn[data-ap="SHA"].active{background:#4caf50}
+.boom-ap-btn[data-ap="PVG"].active{background:#ff9800}
+.airport-badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:.75rem;font-weight:700;color:#fff;margin-bottom:10px}
+.airport-badge.CZX{background:#e91e63}
+.airport-badge.WUX{background:#2196f3}
+.airport-badge.SHA{background:#4caf50}
+.airport-badge.PVG{background:#ff9800}
+.boom-tab-content{display:none}
+.boom-tab-content.active-content{display:block}
+
+
+/* ===== 定位功能 ===== */
+.loc-bar{margin:0 0 16px;padding:14px;border:1px dashed var(--border);border-radius:12px;background:var(--bg-card);}
+.loc-btn{width:100%;padding:11px;border:none;border-radius:8px;background:var(--header-bg);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s;}
+.loc-btn:hover{opacity:.88;}
+.loc-btn:disabled{opacity:.75;cursor:wait;}
+.loc-result{font-size:13px;}
+.loc-pos{font-weight:700;margin-bottom:8px;color:var(--text-primary);line-height:1.5;}
+.loc-acc{font-weight:400;color:var(--text-secondary);font-size:12px;}
+.loc-sub{color:var(--text-secondary);margin:8px 0 6px;}
+.loc-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;margin-bottom:5px;background:var(--bg-secondary);color:var(--text-primary);flex-wrap:wrap;}
+.loc-row.best{background:rgba(46,125,50,.14);font-weight:700;}
+.loc-row.mine{background:#b8860b22;font-weight:700;box-shadow:inset 0 0 0 1px var(--gold);}
+.loc-row em{font-style:normal;font-size:11px;background:var(--header-bg);color:#fff;padding:1px 7px;border-radius:8px;margin-left:6px;white-space:nowrap;}
+.loc-rebtn{margin-top:8px;background:none;border:1px solid var(--border);color:var(--text-secondary);padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;}
+.loc-rebtn:hover{color:var(--text-primary);}
+.loc-err{color:#c62828;font-size:13px;margin-top:8px;line-height:1.5;}
+
+.route-flights{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 4px;font-size:0.85rem}
+.flight-tag{background:var(--gold);color:#fff;padding:2px 8px;border-radius:12px;font-weight:600;font-size:0.8rem}
+.flight-arrow{color:var(--text-secondary);font-size:0.75rem}
+.route-cities{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0 8px;font-size:0.8rem;color:var(--text-secondary)}
+.route-cities span:not(:last-child)::after{content:" →";margin-left:6px;color:var(--text-muted)}
+.route-segments{font-size:0.75rem;color:var(--text-secondary);margin-left:8px}
+
+[data-theme="dark"] .flight-tag{background:var(--gold);color:#1a1a1a}
+[data-theme="dark"] .route-segments{color:var(--text-muted)}
+.boom-ap-btn{padding:4px 12px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;transition:all 0.2s}
+.boom-ap-btn.active,.boom-ap-btn:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+[data-theme="dark"] .boom-ap-btn.active,[data-theme="dark"] .boom-ap-btn:hover{color:#1a1a1a}
+
+/* ===== 新增优化样式 ===== */
+.disclaimer-bar{background:var(--bg-secondary);padding:8px 16px;text-align:center;font-size:0.75rem;color:var(--text-secondary);border-bottom:1px solid var(--border)}
+.disclaimer-bar strong{color:var(--gold-dark)}
+[data-theme="dark"] .disclaimer-bar strong{color:var(--gold)}
+
+/* 骨架屏 */
+.skeleton{position:relative;overflow:hidden;background:var(--bg-card);border-radius:var(--radius-sm)}
+.skeleton::after{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(90deg,transparent 0%,rgba(120,144,156,0.15) 50%,transparent 100%);animation:skeleton-shimmer 1.5s infinite}
+@keyframes skeleton-shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.skeleton-price{height:24px;width:70px;border-radius:4px}
+.skeleton-line{height:14px;border-radius:4px;margin:6px 0}
+.skeleton-line.short{width:60%}
+.skeleton-line.medium{width:80%}
+
+/* 分享按钮 */
+.btn-share{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--text-secondary);font-size:0.75rem;cursor:pointer;transition:all 0.2s}
+.btn-share:hover{border-color:var(--gold);color:var(--gold)}
+.share-toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:0.85rem;opacity:0;transition:all 0.3s;z-index:9999;pointer-events:none}
+.share-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* 收藏筛选栏 */
+.fav-filter-bar{display:flex;justify-content:center;gap:12px;padding:10px 16px 0}
+.fav-filter-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text-secondary);font-size:0.85rem;cursor:pointer;transition:all 0.2s;font-weight:500}
+.fav-filter-btn:hover{border-color:var(--gold);color:var(--gold)}
+.fav-filter-btn.active{background:var(--gold);color:#fff;border-color:var(--gold)}
+.fav-filter-btn .fav-count{display:inline-block;min-width:20px;height:20px;line-height:20px;text-align:center;border-radius:10px;background:rgba(0,0,0,0.1);font-size:0.75rem;padding:0 6px}
+
+.fav-tab-count{display:inline-block;min-width:18px;height:18px;line-height:18px;text-align:center;border-radius:9px;background:rgba(255,255,255,0.2);font-size:0.7rem;padding:0 6px;margin-left:4px;font-weight:500}
+#apt-tab-favorites.active .fav-tab-count{background:rgba(255,255,255,0.35)}
+
+.fav-filter-btn.active .fav-count{background:rgba(255,255,255,0.3)}
+[data-theme="dark"] .fav-filter-btn .fav-count{background:rgba(255,255,255,0.1)}
+
+/* 收藏空状态 */
+.fav-empty{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.fav-empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.5}
+.fav-empty p{margin:4px 0;font-size:0.9rem}
+
+
+/* 收藏按钮 */
+.fav-btn{position:absolute;top:8px;right:8px;width:28px;height:28px;border:none;background:transparent;cursor:pointer;font-size:1rem;z-index:2;transition:transform 0.2s}
+.fav-btn:hover{transform:scale(1.2)}
+.fav-btn.favorited{filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2))}
+.dest-card{position:relative}
+
+/* 价格走势标识 */
+.price-trend{display:inline-block;font-size:0.7rem;padding:1px 5px;border-radius:8px;margin-left:4px;vertical-align:middle}
+.price-trend.down{background:#e8f5e9;color:#2e7d32}
+.price-trend.up{background:#fce4ec;color:#c62828}
+.price-trend.lowest{background:#fff3e0;color:#e65100}
+[data-theme="dark"] .price-trend.down{background:#1b5e2040;color:#00e676}
+[data-theme="dark"] .price-trend.up{background:#b71c1c40;color:#ff5252}
+[data-theme="dark"] .price-trend.lowest{background:#ff6f0040;color:#ffab00}
+
+/* 班期标签 */
+.freq-tag{display:inline-block;font-size:0.65rem;padding:1px 5px;border-radius:6px;background:var(--bg-secondary);color:var(--text-muted);margin-left:4px;border:1px solid var(--border)}
+</style>
+</head>
+<body>
+<button id="themeToggleBtn" class="theme-toggle-btn" aria-label="切换主题" title="切换浅色/深色/系统跟随">🌙</button>
+<header class="header" role="banner">
+<div class="container">
+<h1>✈️ 长三角全球特价航班速查 <small style="font-size:0.7em;opacity:0.85">2026年9月</small></h1>
+<div class="header-meta">
+<span>📅 出行日期：2026年9月下旬</span>
+<span>✈️ 航班时刻：飞常准 | 💰 票价：TripNow实时查询</span>
+<span>🔄 数据更新：2026-09-09</span>
+</div>
+</div>
+</header>
+<div class="disclaimer-bar" role="note">💡 <strong>提示：</strong>以上票价为实时参考价，可能随舱位余量波动，实际价格以航空公司/OTA购票页面为准</div>
+
+<main class="container" role="main">
+<div class="airport-tabs" role="tablist" aria-label="出发机场">
+<button class="ap-tab active" role="tab" aria-selected="true" onclick="switchTab('CZX')" id="apt-tab-CZX">常州奔牛</button>
+<button class="ap-tab" role="tab" aria-selected="false" onclick="switchTab('WUX')" id="apt-tab-WUX">无锡硕放</button>
+<button class="ap-tab" role="tab" aria-selected="false" onclick="switchTab('SHA')" id="apt-tab-SHA">上海虹桥</button>
+<button class="ap-tab" role="tab" aria-selected="false" onclick="switchTab('PVG')" id="apt-tab-PVG">上海浦东</button>
+<button class="ap-tab" role="tab" aria-selected="false" onclick="switchTab('boomerang')" id="apt-tab-boomerang">🪃 回旋镖</button>
+<button class="ap-tab" role="tab" aria-selected="false" onclick="switchFavTab()" id="apt-tab-favorites">⭐ 我的收藏 <span class="fav-tab-count" id="fav-tab-count">0</span></button>
+
+</div>
+<div id="tab-CZX" class="airport-tab-content" style="display:block" role="tabpanel"><div class="search-bar"><input type="text" placeholder="搜索目的地城市或代码..." oninput="searchCards('CZX', this.value)" aria-label="搜索目的地"></div><div class="region-filters"><button class="region-btn active" onclick="filterRegion('CZX','all')">全部</button><button class="region-btn" onclick="filterRegion('CZX','国内')">国内</button><button class="region-btn" onclick="filterRegion('CZX','东南亚')">东南亚</button><button class="region-btn" onclick="filterRegion('CZX','日韩')">日韩</button><button class="region-btn" onclick="filterRegion('CZX','港澳台')">港澳台</button></div><div class="region-section" data-region="国内"><h3 class="region-title">国内</h3><div class="cards-grid"><div class="dest-card" onclick="openModal(this)" data-search="大连 DLC 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">大连</div><div class="dest-code">DLC</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥278</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞4班</span></div></div><div class="flight-line">✈ 9C6832 16:45</div><div class="card-meta"><span>机型:738</span><span>准点:80.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=DLC&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-DLC" class="detail-panel" style="display:none"><h4>航班列表 <small>(4个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>ZH9391</td><td>深航</td><td>11:35</td><td>13:15</td><td>738</td><td>80.00%</td><td>9-28</td><td>2号门</td></tr><tr><td>MU2834</td><td>东航</td><td>16:45</td><td>18:20</td><td>320</td><td>50.00%</td><td>9-28</td><td>2号门</td></tr><tr><td>MU2673</td><td>东航</td><td>19:20</td><td>21:00</td><td>31G</td><td>53.33%</td><td>9-28</td><td>2号门</td></tr><tr><td>9C7622</td><td>春秋</td><td>22:15</td><td>23:55</td><td>A320</td><td>70.00%</td><td>12,13</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="沈阳 SHE 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">沈阳</div><div class="dest-code">SHE</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥259</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞2班</span></div></div><div class="flight-line">✈ 9C6174 22:40</div><div class="card-meta"><span>机型:32A</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=SHE&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-SHE" class="detail-panel" style="display:none"><h4>航班列表 <small>(2个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>ZH9653</td><td>深航</td><td>12:50</td><td>14:55</td><td>32A</td><td></td><td>9-28</td><td>2号门</td></tr><tr><td>9C6174</td><td>春秋</td><td>22:40</td><td>00:50</td><td>A320</td><td></td><td>12,13</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="厦门 XMN 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">厦门</div><div class="dest-code">XMN</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥300</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞3班</span></div></div><div class="flight-line">✈ SC2102 22:10</div><div class="card-meta"><span>机型:320</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=XMN&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-XMN" class="detail-panel" style="display:none"><h4>航班列表 <small>(3个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2939</td><td>东航</td><td>07:00</td><td>09:00</td><td>320</td><td></td><td>9-28</td><td>2号门</td></tr><tr><td>MU2689</td><td>东航</td><td>13:05</td><td>15:00</td><td>319</td><td></td><td>9-28</td><td>2号门</td></tr><tr><td>MU2913</td><td>东航</td><td>20:05</td><td>21:45</td><td>320</td><td></td><td>9-28</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="兰州 LHW 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">兰州</div><div class="dest-code">LHW</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥269</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞1班</span></div></div><div class="flight-line">✈ 9C6362 11:30</div><div class="card-meta"><span>机型:A320</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=LHW&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-LHW" class="detail-panel" style="display:none"><h4>航班列表 <small>(1个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>9C6362</td><td>春秋</td><td>21:40</td><td>00:35</td><td>A320</td><td></td><td>12,13</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="昆明 KMG 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">昆明</div><div class="dest-code">KMG</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥458</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ KY3224 13:20</div><div class="card-meta"><span>机型:31G</span><span>准点:30.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=KMG&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-KMG" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU9763</td><td>东航</td><td>07:15</td><td>10:50</td><td>31G</td><td>30.00%</td><td>9-28</td><td>2号门</td></tr><tr><td>MU2953</td><td>东航</td><td>12:35</td><td>15:10</td><td>320</td><td>70.83%</td><td>9-28</td><td>2号门</td></tr><tr><td>3U8292</td><td>川航</td><td>13:20</td><td>16:10</td><td>320</td><td>23.33%</td><td>9-28</td><td>2号门</td></tr><tr><td>KY3224</td><td>昆明航</td><td>20:40</td><td>23:40</td><td>738</td><td>80.00%</td><td>9-28</td><td>2号门</td></tr><tr><td>3U8296</td><td>川航</td><td>21:40</td><td>00:35</td><td>32U</td><td>56.67%</td><td>9-28</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="青岛 TAO 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">青岛</div><div class="dest-code">TAO</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥260</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞1班</span></div></div><div class="flight-line">✈ SC4800 09:55</div><div class="card-meta"><span>机型:738</span><span>准点:96.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=TAO&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-TAO" class="detail-panel" style="display:none"><h4>航班列表 <small>(1个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>SC4800</td><td>山航</td><td>10:00</td><td>11:10</td><td>738</td><td>96.67%</td><td>9-28</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="成都 CTU 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">成都</div><div class="dest-code">CTU</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥400</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞1班</span></div></div><div class="flight-line">✈ MU2935 13:00</div><div class="card-meta"><span>机型:32Z</span><span>准点:83.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=CTU&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-CTU" class="detail-panel" style="display:none"><h4>航班列表 <small>(1个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>3U8978</td><td>川航</td><td>09:50</td><td>12:20</td><td>32Z</td><td>83.33%</td><td>9-28</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="西安 XIY 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">西安</div><div class="dest-code">XIY</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥368</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞3班</span></div></div><div class="flight-line">✈ MU2971 07:05</div><div class="card-meta"><span>机型:31G</span><span>准点:96.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=XIY&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-XIY" class="detail-panel" style="display:none"><h4>航班列表 <small>(3个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2971</td><td>东航</td><td>07:05</td><td>09:25</td><td>31G</td><td>96.67%</td><td>9-28</td><td>2号门</td></tr><tr><td>GJ8116</td><td>长龙航</td><td>14:55</td><td>17:05</td><td>320</td><td>46.67%</td><td>9-28</td><td>2号门</td></tr><tr><td>MU2983</td><td>东航</td><td>20:20</td><td>22:30</td><td>320</td><td>53.33%</td><td>9-28</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="广州 CAN 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">广州</div><div class="dest-code">CAN</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥400</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ CZ3994 07:05</div><div class="card-meta"><span>机型:32H</span><span>准点:96.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=CAN&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-CAN" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>CZ3994</td><td>南航</td><td>07:05</td><td>09:20</td><td>32H</td><td>96.67%</td><td>9-28</td><td>2号门</td></tr><tr><td>MU2947</td><td>东航</td><td>08:50</td><td>11:10</td><td>320</td><td>76.67%</td><td>9-28</td><td>2号门</td></tr><tr><td>CZ3908</td><td>南航</td><td>11:40</td><td>14:10</td><td>73H</td><td>53.33%</td><td>9-28</td><td>2号门</td></tr><tr><td>ZH8944</td><td>深航</td><td>14:35</td><td>16:45</td><td>73H</td><td>36.67%</td><td>9-28</td><td>2号门</td></tr><tr><td>ZH8958</td><td>深航</td><td>18:10</td><td>20:25</td><td>32A</td><td>46.67%</td><td>9-28</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="重庆 CKG 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">重庆</div><div class="dest-code">CKG</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥380</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞4班</span></div></div><div class="flight-line">✈ MU2903 07:05</div><div class="card-meta"><span>机型:320</span><span>准点:96.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=CKG&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-CKG" class="detail-panel" style="display:none"><h4>航班列表 <small>(4个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2903</td><td>东航</td><td>07:05</td><td>09:35</td><td>320</td><td>96.67%</td><td>9-28</td><td>2号门</td></tr><tr><td>3U8098</td><td>川航</td><td>09:40</td><td>12:00</td><td>32G</td><td>80.00%</td><td>9-28</td><td>2号门</td></tr><tr><td>MU2785</td><td>东航</td><td>13:45</td><td>16:10</td><td>320</td><td>30.00%</td><td>9-28</td><td>2号门</td></tr><tr><td>CZ2122</td><td>南航</td><td>16:35</td><td>19:15</td><td>32X</td><td>21.74%</td><td>9-28</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="贵阳 KWE 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">贵阳</div><div class="dest-code">KWE</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥507</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞3班</span></div></div><div class="flight-line">✈ SC4799 15:20</div><div class="card-meta"><span>机型:738</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=KWE&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-KWE" class="detail-panel" style="display:none"><h4>航班列表 <small>(3个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>AQ1374</td><td>九元</td><td>15:05</td><td>17:35</td><td>738</td><td></td><td>14,15</td><td>2号门</td></tr><tr><td>SC4799</td><td>山航</td><td>15:20</td><td>17:40</td><td>738</td><td></td><td>9-28</td><td>2号门</td></tr><tr><td>GY7146</td><td>多彩贵州</td><td>22:00</td><td>00:25</td><td>32D</td><td></td><td>9-28</td><td>2号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="海口 HAK 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">海口</div><div class="dest-code">HAK</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥550</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞1班</span></div></div><div class="flight-line">✈ ZH9749 18:45</div><div class="card-meta"><span>机型:320</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=CZX&arrCity=HAK&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-CZX-HAK" class="detail-panel" style="display:none"><h4>航班列表 <small>(1个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>ZH9749</td><td>深航</td><td>18:45</td><td>21:35</td><td>320</td><td></td><td>9-28</td><td>2号门</td></tr></table></div></div></div></div></div><div class="region-section" style="display:none" data-region="东南亚"><h3 class="region-title">东南亚</h3><div class="cards-grid"></div></div><div class="region-section" style="display:none" data-region="日韩"><h3 class="region-title">日韩</h3><div class="cards-grid"></div></div><div class="region-section" style="display:none" data-region="港澳台"><h3 class="region-title">港澳台</h3><div class="cards-grid"></div></div><div class="transport-section"><h3 class="transport-title">🚗 机场交通 - 常州奔牛机场</h3><div class="loc-bar" data-airport="CZX"><button type="button" class="loc-btn" onclick="locateMe('CZX',this)">📍 定位我，实时算出到机场的距离与时间</button><div class="loc-result" style="display:none"></div></div><div class="transport-grid"><div class="transport-card"><h4>🚗 驾车/打车</h4><div class="transport-info"><div>距离: <strong>33.4km</strong></div><div>用时: <strong>55分钟</strong></div><div>预估费用: <strong>¥89</strong></div></div><a href="https://www.didiglobal.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🚕 滴滴打车</a> <a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn" style="margin-left:8px">🗺️ 高德导航</a></div><div class="transport-card"><h4>🚇 公共交通</h4><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案1</span><span>180分钟 · ¥8.0</span></div><div class="transit-steps">57路(火车站公交中心站--孟河公交中心站) → 步行975m → K3路(孟城--火车站公交中心站)</div></div><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案2</span><span>183分钟 · ¥5.0</span></div><div class="transit-steps">19路(红梅公交中心站--锦海星城) → 步行244m → 32路(火车站公交中心站--民航机场)</div></div><a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🗺️ 高德查询</a></div><div class="transport-card"><h4>🚇 地铁</h4><div class="transport-info"><div style="color:var(--text-secondary)">常州暂无地铁</div><div> 最近地铁：南京/苏州/无锡</div><div>🚄 常州站→无锡硕放：高铁17min+地铁3号线 <strong>¥62</strong></div></div><a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🗺️ 高德查询</a></div></div></div></div></div><div id="tab-WUX" class="airport-tab-content" style="display:none" role="tabpanel"><div class="search-bar"><input type="text" placeholder="搜索目的地城市或代码..." oninput="searchCards('WUX', this.value)" aria-label="搜索目的地"></div><div class="region-filters"><button class="region-btn active" onclick="filterRegion('WUX','all')">全部</button><button class="region-btn" onclick="filterRegion('WUX','国内')">国内</button><button class="region-btn" onclick="filterRegion('WUX','东南亚')">东南亚</button><button class="region-btn" onclick="filterRegion('WUX','港澳台')">港澳台</button><button class="region-btn" onclick="filterRegion('WUX','日韩')">日韩</button></div><div class="region-section" data-region="国内"><h3 class="region-title">国内</h3><div class="cards-grid"><div class="dest-card" onclick="openModal(this)" data-search="广州 CAN 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">广州</div><div class="dest-code">CAN</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥329</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ AQ1060 09:30</div><div class="card-meta"><span>机型:73H</span><span>准点:93.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=CAN&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-CAN" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>ZH9834</td><td>深航</td><td>07:10</td><td>09:40</td><td>73H</td><td>93.33%</td><td>59-63</td><td>7号门</td></tr><tr><td>ZH9832</td><td>深航</td><td>08:00</td><td>10:30</td><td>73H</td><td>76.67%</td><td>59-63</td><td>7号门</td></tr><tr><td>ZH9824</td><td>深航</td><td>11:50</td><td>14:15</td><td>73H</td><td>53.33%</td><td>59-63</td><td>7号门</td></tr><tr><td>CZ3914</td><td>南航</td><td>12:05</td><td>14:35</td><td>32V</td><td>63.33%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>MU2917</td><td>东航</td><td>13:25</td><td>15:35</td><td>32N</td><td>56.67%</td><td>34-39</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="青岛 TAO 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">青岛</div><div class="dest-code">TAO</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥290</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞1班</span></div></div><div class="flight-line">✈ MU2701 07:20</div><div class="card-meta"><span>机型:320</span><span>准点:100.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=TAO&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-TAO" class="detail-panel" style="display:none"><h4>航班列表 <small>(1个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2701</td><td>东航</td><td>07:20</td><td>08:40</td><td>320</td><td>100.00%</td><td>34-39</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="大连 DLC 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">大连</div><div class="dest-code">DLC</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥340</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞4班</span></div></div><div class="flight-line">✈ MU2837 11:10</div><div class="card-meta"><span>机型:73H</span><span>准点:93.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=DLC&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-DLC" class="detail-panel" style="display:none"><h4>航班列表 <small>(4个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>DR5314</td><td>苏南瑞丽航空</td><td>08:20</td><td>10:00</td><td>73H</td><td>93.33%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>MU2747</td><td>东航</td><td>11:10</td><td>12:55</td><td>320</td><td>66.67%</td><td>34-39</td><td>5、6号门</td></tr><tr><td>GJ8740</td><td>长龙航</td><td>20:15</td><td>22:00</td><td>320</td><td>80.00%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>MU2837</td><td>东航</td><td>20:50</td><td>22:30</td><td>320</td><td>56.67%</td><td>34-39</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="昆明 KMG 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">昆明</div><div class="dest-code">KMG</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥330</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ 8L9600 20:50</div><div class="card-meta"><span>机型:320</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=KMG&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-KMG" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2975</td><td>东航</td><td>07:25</td><td>10:25</td><td>320</td><td></td><td>34-39</td><td>5、6号门</td></tr><tr><td>DR6526</td><td>苏南瑞丽航空</td><td>08:00</td><td>11:00</td><td>73H</td><td>63.33%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>MU2985</td><td>东航</td><td>14:30</td><td>17:45</td><td>320</td><td>56.67%</td><td>34-39</td><td>5、6号门</td></tr><tr><td>DR6551</td><td>苏南瑞丽航空</td><td>15:55</td><td>19:05</td><td>73J</td><td>26.67%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>A67148</td><td>湖南航</td><td>19:55</td><td>23:05</td><td>321</td><td>83.33%</td><td>40-46</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="沈阳 SHE 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">沈阳</div><div class="dest-code">SHE</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥349</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞4班</span></div></div><div class="flight-line">✈ MU2929 07:30</div><div class="card-meta"><span>机型:320</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=SHE&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-SHE" class="detail-panel" style="display:none"><h4>航班列表 <small>(4个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2929</td><td>东航</td><td>07:30</td><td>09:50</td><td>320</td><td></td><td>34-39</td><td>5、6号门</td></tr><tr><td>ZH8539</td><td>深航</td><td>10:40</td><td>13:00</td><td>32N</td><td></td><td>59-63</td><td>7号门</td></tr><tr><td>AQ1331</td><td>九元</td><td>15:15</td><td>17:40</td><td>738</td><td></td><td>49-51</td><td>7号门</td></tr><tr><td>ZH8541</td><td>深航</td><td>20:55</td><td>23:10</td><td>32N</td><td></td><td>59-63</td><td>7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="福州 FOC 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">福州</div><div class="dest-code">FOC</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥350</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞1班</span></div></div><div class="flight-line">✈ MF8538 10:30</div><div class="card-meta"><span>机型:738</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=FOC&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-FOC" class="detail-panel" style="display:none"><h4>航班列表 <small>(1个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MF8538</td><td>厦航</td><td>10:30</td><td>12:00</td><td>738</td><td></td><td>40-46</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="西安 XIY 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">西安</div><div class="dest-code">XIY</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥380</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ MU2709 17:05</div><div class="card-meta"><span>机型:32N</span><span>准点:56.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=XIY&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-XIY" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2955</td><td>东航</td><td>07:10</td><td>09:30</td><td>32N</td><td>56.67%</td><td>34-39</td><td>5、6号门</td></tr><tr><td>ZH9288</td><td>深航</td><td>10:10</td><td>12:15</td><td>32A</td><td>93.33%</td><td>59-63</td><td>7号门</td></tr><tr><td>MU2781</td><td>东航</td><td>11:30</td><td>13:50</td><td>320</td><td>93.33%</td><td>34-39</td><td>5、6号门</td></tr><tr><td>ZH9286</td><td>深航</td><td>12:50</td><td>15:10</td><td>73H</td><td>66.67%</td><td>59-63</td><td>7号门</td></tr><tr><td>MU2861</td><td>东航</td><td>15:40</td><td>17:45</td><td>320</td><td></td><td>34-39</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="厦门 XMN 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">厦门</div><div class="dest-code">XMN</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥370</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞3班</span></div></div><div class="flight-line">✈ MU2789 08:00</div><div class="card-meta"><span>机型:320</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=XMN&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-XMN" class="detail-panel" style="display:none"><h4>航班列表 <small>(3个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2789</td><td>东航</td><td>08:00</td><td>09:40</td><td>320</td><td></td><td>34-39</td><td>5、6号门</td></tr><tr><td>MU2819</td><td>东航</td><td>14:50</td><td>16:50</td><td>320</td><td></td><td>34-39</td><td>5、6号门</td></tr><tr><td>MU2979</td><td>东航</td><td>19:00</td><td>20:50</td><td>325</td><td></td><td>34-39</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="北京 PEK 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">北京</div><div class="dest-code">PEK</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥360</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ MU2949 13:45</div><div class="card-meta"><span>机型:73H</span><span>准点:96.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=PEK&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-PEK" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>ZH9158</td><td>深航</td><td>07:40</td><td>09:45</td><td>73H</td><td>96.67%</td><td>59-63</td><td>7号门</td></tr><tr><td>ZH9156</td><td>深航</td><td>13:25</td><td>15:30</td><td>73H</td><td>93.33%</td><td>59-63</td><td>7号门</td></tr><tr><td>ZH9160</td><td>深航</td><td>18:10</td><td>19:55</td><td>73H</td><td>73.33%</td><td>59-63</td><td>7号门</td></tr><tr><td>ZH9198</td><td>深航</td><td>20:30</td><td>22:40</td><td>73H</td><td>63.33%</td><td>59-63</td><td>7号门</td></tr><tr><td>ZH9162</td><td>深航</td><td>22:05</td><td>00:05</td><td>73H</td><td>36.67%</td><td>59-63</td><td>7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="贵阳 KWE 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">贵阳</div><div class="dest-code">KWE</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥479</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ AQ1332 17:00</div><div class="card-meta"><span>机型:32D</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=KWE&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-KWE" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>A67735</td><td>湖南航</td><td>10:25</td><td>13:05</td><td>32D</td><td></td><td>40-46</td><td>5、6号门</td></tr><tr><td>ZH8523</td><td>深航</td><td>14:10</td><td>16:45</td><td>73H</td><td></td><td>59-63</td><td>7号门</td></tr><tr><td>ZH8527</td><td>深航</td><td>14:10</td><td>16:45</td><td>73H</td><td></td><td>59-63</td><td>7号门</td></tr><tr><td>AQ1332</td><td>九元</td><td>17:00</td><td>19:40</td><td>738</td><td></td><td>49-51</td><td>7号门</td></tr><tr><td>DR5341</td><td>苏南瑞丽航空</td><td>20:10</td><td>22:40</td><td>73H</td><td></td><td>40-46</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="重庆 CKG 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">重庆</div><div class="dest-code">CKG</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥450</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ ZH9551 07:05</div><div class="card-meta"><span>机型:73H</span><span>准点:90.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=CKG&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-CKG" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>ZH9551</td><td>深航</td><td>07:05</td><td>09:40</td><td>73H</td><td>90.00%</td><td>59-63</td><td>7号门</td></tr><tr><td>MU9765</td><td>东航</td><td>07:10</td><td>09:40</td><td>325</td><td>76.67%</td><td>34-39</td><td>5、6号门</td></tr><tr><td>HO2003</td><td>吉祥</td><td>10:50</td><td>13:15</td><td>32N</td><td>86.67%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>HO2013</td><td>吉祥</td><td>10:50</td><td>13:15</td><td>32S</td><td>100.00%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>3U8026</td><td>川航</td><td>12:40</td><td>15:10</td><td>32G</td><td>33.33%</td><td>40-46</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="成都 CTU 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">成都</div><div class="dest-code">CTU</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥410</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ MU2825 19:50</div><div class="card-meta"><span>机型:32Z</span><span>准点:80.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=CTU&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-CTU" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>3U8980</td><td>川航</td><td>10:30</td><td>13:15</td><td>32Z</td><td>80.00%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>3U8960</td><td>川航</td><td>12:10</td><td>14:40</td><td>32C</td><td>60.00%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>3U8982</td><td>川航</td><td>12:45</td><td>15:30</td><td>32Z</td><td>36.67%</td><td>40-46</td><td>5、6号门</td></tr><tr><td>ZH9547</td><td>深航</td><td>17:00</td><td>19:55</td><td>73H</td><td>60.00%</td><td>59-63</td><td>7号门</td></tr><tr><td>3U8984</td><td>川航</td><td>18:45</td><td>21:30</td><td>32Z</td><td>80.00%</td><td>40-46</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="深圳 SZX 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">深圳</div><div class="dest-code">SZX</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥600</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞6班</span></div></div><div class="flight-line">✈ ZH9808 21:55</div><div class="card-meta"><span>机型:73H</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=SZX&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-SZX" class="detail-panel" style="display:none"><h4>航班列表 <small>(6个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>ZH9814</td><td>深航</td><td>07:20</td><td>09:45</td><td>73H</td><td></td><td>59-63</td><td>7号门</td></tr><tr><td>ZH9816</td><td>深航</td><td>08:35</td><td>10:40</td><td>73H</td><td></td><td>59-63</td><td>7号门</td></tr><tr><td>ZH9802</td><td>深航</td><td>10:55</td><td>13:30</td><td>321</td><td></td><td>59-63</td><td>7号门</td></tr><tr><td>DR5003</td><td>苏南瑞丽航空</td><td>13:30</td><td>16:00</td><td>73H</td><td></td><td>40-46</td><td>5、6号门</td></tr><tr><td>ZH9804</td><td>深航</td><td>14:00</td><td>16:25</td><td>73H</td><td></td><td>59-63</td><td>7号门</td></tr><tr><td>ZH9806</td><td>深航</td><td>15:10</td><td>18:15</td><td>73H</td><td></td><td>59-63</td><td>7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="桂林 KWL 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">桂林</div><div class="dest-code">KWL</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥496</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞2班</span></div></div><div class="flight-line">✈ HO2013 13:40</div><div class="card-meta"><span>机型:32S</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=KWL&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-KWL" class="detail-panel" style="display:none"><h4>航班列表 <small>(2个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>HO2013</td><td>吉祥</td><td>13:40</td><td>16:00</td><td>32S</td><td></td><td>40-46</td><td>5、6号门</td></tr><tr><td>HO2019</td><td>吉祥</td><td>14:50</td><td>17:10</td><td>32S</td><td></td><td>40-46</td><td>5、6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="三亚 SYX 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">三亚</div><div class="dest-code">SYX</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥598</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞2班</span></div></div><div class="flight-line">✈ MU2733 10:45</div><div class="card-meta"><span>机型:325</span><span>准点:60.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=SYX&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-SYX" class="detail-panel" style="display:none"><h4>航班列表 <small>(2个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2733</td><td>东航</td><td>10:45</td><td>13:50</td><td>325</td><td>60.00%</td><td>34-39</td><td>5、6号门</td></tr><tr><td>HO2009</td><td>吉祥</td><td>12:35</td><td>15:50</td><td>32N</td><td>86.67%</td><td>40-46</td><td>5、6号门</td></tr></table></div></div></div></div></div><div class="region-section" style="display:none" data-region="东南亚"><h3 class="region-title">东南亚</h3><div class="cards-grid"></div></div><div class="region-section" data-region="日韩"><h3 class="region-title">日韩</h3><div class="cards-grid"><div class="dest-card" onclick="openModal(this)" data-search="首尔 ICN 🇰🇷"><div class="card-header"><div class="card-left"><span class="dest-flag">🇰🇷</span><div><div class="dest-city">首尔</div><div class="dest-code">ICN</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥784</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞1班</span></div></div><div class="flight-line">✈ MF8538 15:30</div><div class="card-meta"><span>机型:32N</span><span>准点:80.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=ICN&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-ICN" class="detail-panel" style="display:none"><h4>航班列表 <small>(1个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2989</td><td>东航</td><td>15:30</td><td>18:40</td><td>32N</td><td>80.00%</td><td>2-8</td><td>2号门</td></tr></table></div></div></div></div></div><div class="region-section" data-region="港澳台"><h3 class="region-title">港澳台</h3><div class="cards-grid"><div class="dest-card" onclick="openModal(this)" data-search="澳门 MFM 🇲🇴"><div class="card-header"><div class="card-left"><span class="dest-flag">🇲🇴</span><div><div class="dest-city">澳门</div><div class="dest-code">MFM</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥726</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞2班</span></div></div><div class="flight-line">✈ MU1082 05:30</div><div class="card-meta"><span>机型:73H</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=WUX&arrCity=MFM&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-WUX-MFM" class="detail-panel" style="display:none"><h4>航班列表 <small>(2个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>ZH9097</td><td>深航</td><td>09:35</td><td>12:10</td><td>73H</td><td></td><td>2-8</td><td>2号门</td></tr><tr><td>MU2961</td><td>东航</td><td>13:30</td><td>15:50</td><td>320</td><td></td><td>2-8</td><td>2号门</td></tr></table></div></div></div></div></div><div class="transport-section"><h3 class="transport-title">🚗 机场交通 - 无锡硕放机场</h3><div class="loc-bar" data-airport="WUX"><button type="button" class="loc-btn" onclick="locateMe('WUX',this)">📍 定位我，实时算出到机场的距离与时间</button><div class="loc-result" style="display:none"></div></div><div class="transport-grid"><div class="transport-card"><h4>🚗 驾车/打车</h4><div class="transport-info"><div>距离: <strong>17.1km</strong></div><div>用时: <strong>35分钟</strong></div><div>预估费用: <strong>¥47</strong></div></div><a href="https://www.didiglobal.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🚕 滴滴打车</a> <a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn" style="margin-left:8px">🗺️ 高德导航</a></div><div class="transport-card"><h4>🚇 公共交通</h4><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案1</span><span>75分钟 · ¥5.0</span></div><div class="transit-steps">地铁2号线(梅园开原寺--无锡东站) → 步行658m → 地铁3号线(苏庙--硕放机场)</div></div><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案2</span><span>85分钟 · ¥7.0</span></div><div class="transit-steps">地铁2号线(梅园开原寺--无锡东站) → 步行658m → 地铁3号线(苏庙--硕放机场)</div></div><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案3</span><span>89分钟 · ¥6.0</span></div><div class="transit-steps">767路(无锡汽车站--锡绅路停车场) → 步行525m → 地铁3号线(苏庙--硕放机场)</div></div><a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🗺️ 高德查询</a></div><div class="transport-card"><h4>🚇 地铁</h4><div class="transport-info"><div>🚇 <strong>地铁3号线</strong> 直达硕放机场站</div><div>运营时间：06:00-22:30</div><div>票价：<strong>¥2</strong></div></div><a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🗺️ 高德查询</a></div></div></div></div></div><div id="tab-SHA" class="airport-tab-content" style="display:none" role="tabpanel"><div class="search-bar"><input type="text" placeholder="搜索目的地城市或代码..." oninput="searchCards('SHA', this.value)" aria-label="搜索目的地"></div><div class="region-filters"><button class="region-btn active" onclick="filterRegion('SHA','all')">全部</button><button class="region-btn" onclick="filterRegion('SHA','国内')">国内</button><button class="region-btn" onclick="filterRegion('SHA','日韩')">日韩</button><button class="region-btn" onclick="filterRegion('SHA','港澳台')">港澳台</button></div><div class="region-section" data-region="国内"><h3 class="region-title">国内</h3><div class="cards-grid"><div class="dest-card" onclick="openModal(this)" data-search="厦门 XMN 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">厦门</div><div class="dest-code">XMN</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥288</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞6班</span></div></div><div class="flight-line">✈ 9C8807 07:15</div><div class="card-meta"><span>机型:738</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=XMN&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-XMN" class="detail-panel" style="display:none"><h4>航班列表 <small>(6个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>FM9263</td><td>上航</td><td>06:50</td><td>08:40</td><td>738</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>9C8815</td><td>春秋</td><td>07:15</td><td>09:05</td><td>A321</td><td></td><td>D08-D24</td><td>6号门</td></tr><tr><td>MU5635</td><td>东航</td><td>07:50</td><td>09:55</td><td>325</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU5247</td><td>东航</td><td>07:50</td><td>09:55</td><td>320</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MF8518</td><td>厦航</td><td>08:10</td><td>10:00</td><td>738</td><td></td><td>D01-D07</td><td>6号门</td></tr><tr><td>MU5663</td><td>东航</td><td>08:55</td><td>10:40</td><td>325</td><td></td><td>B,C,D</td><td>6、7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="广州 CAN 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">广州</div><div class="dest-code">CAN</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥298</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ 9C8929 21:20</div><div class="card-meta"><span>机型:A321</span><span>准点:96.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=CAN&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-CAN" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>9C8835</td><td>春秋</td><td>07:15</td><td>09:40</td><td>A321</td><td>96.67%</td><td>D08-D24</td><td>6号门</td></tr><tr><td>HO1855</td><td>吉祥</td><td>07:25</td><td>09:50</td><td>32A</td><td>100.00%</td><td>E01-E18</td><td>7号门</td></tr><tr><td>FM9303</td><td>上航</td><td>08:30</td><td>11:00</td><td>73L</td><td>50.00%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>HO2287</td><td>吉祥</td><td>08:40</td><td>11:05</td><td>32S</td><td>76.67%</td><td>E01-E18</td><td>7号门</td></tr><tr><td>CZ3596</td><td>南航</td><td>08:50</td><td>11:15</td><td>78C</td><td>73.33%</td><td>D10-D18</td><td>6号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="昆明 KMG 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">昆明</div><div class="dest-code">KMG</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥388</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ 9C8953 07:55</div><div class="card-meta"><span>机型:73A</span><span>准点:83.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=KMG&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-KMG" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>FM9453</td><td>上航</td><td>07:40</td><td>11:00</td><td>73A</td><td>83.33%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>HO1121</td><td>吉祥</td><td>07:50</td><td>11:10</td><td>32A</td><td>93.33%</td><td>E01-E18</td><td>7号门</td></tr><tr><td>9C8953</td><td>春秋</td><td>07:55</td><td>11:20</td><td>A320</td><td>80.00%</td><td>D08-D24</td><td>6号门</td></tr><tr><td>MU5814</td><td>东航</td><td>08:15</td><td>11:50</td><td>73L</td><td>80.00%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU6483</td><td>东航</td><td>08:40</td><td>11:55</td><td>32N</td><td>76.67%</td><td>B,C,D</td><td>6、7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="西安 XIY 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">西安</div><div class="dest-code">XIY</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥348</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ 9C8845 07:10</div><div class="card-meta"><span>机型:A320</span><span>准点:93.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=XIY&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-XIY" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>9C8845</td><td>春秋</td><td>07:10</td><td>09:40</td><td>A320</td><td>93.33%</td><td>D08-D24</td><td>6号门</td></tr><tr><td>HO1217</td><td>吉祥</td><td>07:35</td><td>10:10</td><td>32S</td><td>86.67%</td><td>E01-E18</td><td>7号门</td></tr><tr><td>MU2152</td><td>东航</td><td>08:20</td><td>10:50</td><td>919</td><td>53.33%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>9C6401</td><td>春秋</td><td>09:20</td><td>11:50</td><td>A320</td><td>76.67%</td><td>D08-D24</td><td>6号门</td></tr><tr><td>MU2225</td><td>东航</td><td>09:25</td><td>11:45</td><td>919</td><td>43.33%</td><td>B,C,D</td><td>6、7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="武汉 WUH 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">武汉</div><div class="dest-code">WUH</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥340</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞6班</span></div></div><div class="flight-line">✈ MU2510 07:25</div><div class="card-meta"><span>机型:73E</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=WUH&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-WUH" class="detail-panel" style="display:none"><h4>航班列表 <small>(6个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2510</td><td>东航</td><td>07:25</td><td>09:20</td><td>73E</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU5385</td><td>东航</td><td>08:30</td><td>10:20</td><td>919</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU2508</td><td>东航</td><td>08:30</td><td>10:20</td><td>919</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU2506</td><td>东航</td><td>11:10</td><td>13:00</td><td>73E</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU2554</td><td>东航</td><td>13:10</td><td>15:00</td><td>73E</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU2469</td><td>东航</td><td>13:10</td><td>15:00</td><td>73E</td><td></td><td>B,C,D</td><td>6、7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="青岛 TAO 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">青岛</div><div class="dest-code">TAO</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥280</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ SC4656 7:15</div><div class="card-meta"><span>机型:73E</span><span>准点:100.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=TAO&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-TAO" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>FM9229</td><td>上航</td><td>06:50</td><td>08:30</td><td>73E</td><td>100.00%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU5539</td><td>东航</td><td>07:15</td><td>08:55</td><td>320</td><td>96.67%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>HO1175</td><td>吉祥</td><td>07:25</td><td>09:05</td><td>32S</td><td>100.00%</td><td>E01-E18</td><td>7号门</td></tr><tr><td>MU5513</td><td>东航</td><td>10:10</td><td>11:40</td><td>325</td><td>73.33%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>SC4660</td><td>山航</td><td>10:15</td><td>12:00</td><td>738</td><td>73.33%</td><td>A06-A17</td><td>7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="济南 TNA 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">济南</div><div class="dest-code">TNA</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥367</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞2班</span></div></div><div class="flight-line">✈ MU5571 06:55</div><div class="card-meta"><span>机型:323</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=TNA&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-TNA" class="detail-panel" style="display:none"><h4>航班列表 <small>(2个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU5571</td><td>东航</td><td>06:55</td><td>08:50</td><td>323</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>SC1166</td><td>山航</td><td>10:45</td><td>12:25</td><td>738</td><td></td><td>A06-A17</td><td>7号门</td></tr></table></div></div></div><<div class="dest-card" onclick="openModal(this)" data-search="重庆 CKG 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">重庆</div><div class="dest-code">CKG</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥508</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ 9C8897 16:05</div><div class="card-meta"><span>机型:A321</span><span>准点:86.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=CKG&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-CKG" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>9C8897</td><td>春秋</td><td>07:40</td><td>10:20</td><td>A321</td><td>86.67%</td><td>D08-D24</td><td>6号门</td></tr><tr><td>MU5421</td><td>东航</td><td>08:00</td><td>10:40</td><td>327</td><td>83.33%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU9195</td><td>东航</td><td>09:15</td><td>11:55</td><td>919</td><td>50.00%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU5425</td><td>东航</td><td>10:05</td><td>12:50</td><td>32N</td><td>66.67%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>CA4544</td><td>国航</td><td>11:45</td><td>14:40</td><td>738</td><td>86.67%</td><td>A06-A17</td><td>7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="北京 PEK 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">北京</div><div class="dest-code">PEK</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥450</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ MU5159 14:30</div><div class="card-meta"><span>机型:333</span><span>准点:93.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=PEK&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-PEK" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU5099</td><td>东航</td><td>07:00</td><td>09:15</td><td>333</td><td>93.33%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>CA1564</td><td>国航</td><td>07:55</td><td>10:10</td><td>33A</td><td>96.67%</td><td>A06-A17</td><td>7号门</td></tr><tr><td>MU5101</td><td>东航</td><td>08:00</td><td>10:10</td><td>773</td><td>83.33%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>HU7602</td><td>海航</td><td>08:20</td><td>10:40</td><td>336</td><td>93.33%</td><td>A03-A05</td><td>7号门</td></tr><tr><td>CA1590</td><td>国航</td><td>08:55</td><td>11:10</td><td>33A</td><td>70.00%</td><td>A06-A17</td><td>7号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="郑州 CGO 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">郑州</div><div class="dest-code">CGO</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥462</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞6班</span></div></div><div class="flight-line">✈ FM9321 17:15</div><div class="card-meta"><span>机型:737</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=CGO&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-CGO" class="detail-panel" style="display:none"><h4>航班列表 <small>(6个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU5395</td><td>东航</td><td>07:35</td><td>09:35</td><td>737</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>FM9347</td><td>上航</td><td>11:55</td><td>14:10</td><td>73E</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>FM9329</td><td>上航</td><td>14:30</td><td>16:30</td><td>73A</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>FM9349</td><td>上航</td><td>16:00</td><td>18:00</td><td>73E</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>FM9321</td><td>上航</td><td>17:15</td><td>19:00</td><td>73E</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>FM9327</td><td>上航</td><td>19:20</td><td>21:10</td><td>73E</td><td></td><td>B,C,D</td><td>6、7号门</td></tr></table></div></div></div>div class="dest-card" onclick="openModal(this)" data-search="成都 CTU 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">成都</div><div class="dest-code">CTU</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥498</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ 9C6101 07:50</div><div class="card-meta"><span>机型:325</span><span>准点:90.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=CTU&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-CTU" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU5401</td><td>东航</td><td>08:15</td><td>11:05</td><td>325</td><td>90.00%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MU5403</td><td>东航</td><td>09:05</td><td>12:15</td><td>773</td><td>53.33%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>9C7685</td><td>春秋</td><td>09:20</td><td>12:25</td><td>A321</td><td>56.67%</td><td>D08-D24</td><td>6号门</td></tr><tr><td>MU5409</td><td>东航</td><td>12:30</td><td>15:40</td><td>325</td><td>86.67%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>EU6670</td><td>成都航</td><td>13:00</td><td>16:10</td><td>32Y</td><td>80.00%</td><td>B12-C17</td><td>6、7号门</td></tr></table></div></div></div><<div class="dest-card" onclick="openModal(this)" data-search="海口 HAK 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">海口</div><div class="dest-code">HAK</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥523</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞4班</span></div></div><div class="flight-line">✈ FM9269 08:50</div><div class="card-meta"><span>机型:738</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=HAK&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-HAK" class="detail-panel" style="display:none"><h4>航班列表 <small>(4个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>HU7320</td><td>海航</td><td>08:30</td><td>11:35</td><td>738</td><td></td><td>A03-A05</td><td>7号门</td></tr><tr><td>FM9269</td><td>上航</td><td>08:50</td><td>13:50</td><td>738</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>FM9251</td><td>上航</td><td>10:40</td><td>13:40</td><td>73E</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>FM9253</td><td>上航</td><td>16:45</td><td>19:45</td><td>73L</td><td></td><td>B,C,D</td><td>6、7号门</td></tr></table></div></div></div>div class="dest-card" onclick="openModal(this)" data-search="三亚 SYX 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">三亚</div><div class="dest-code">SYX</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥500</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ HO1127 06:15</div><div class="card-meta"><span>机型:325</span><span>准点:100.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=SYX&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-SYX" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>FM9537</td><td>上航</td><td>06:55</td><td>10:00</td><td>325</td><td>100.00%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>HO1177</td><td>吉祥</td><td>09:20</td><td>12:30</td><td>32A</td><td>63.33%</td><td>E01-E18</td><td>7号门</td></tr><tr><td>FM9535</td><td>上航</td><td>12:05</td><td>15:25</td><td>73E</td><td>76.67%</td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>HO1129</td><td>吉祥</td><td>12:45</td><td>15:55</td><td>32S</td><td>80.00%</td><td>E01-E18</td><td>7号门</td></tr><tr><td>HO1127</td><td>吉祥</td><td>16:15</td><td>19:25</td><td>32A</td><td>83.33%</td><td>E01-E18</td><td>7号门</td></tr></table></div></div></div><<div class="dest-card" onclick="openModal(this)" data-search="深圳 SZX 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">深圳</div><div class="dest-code">SZX</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥598</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞6班</span></div></div><div class="flight-line">✈ 9C8881 06:40</div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=SHA&arrCity=SZX&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-SHA-SZX" class="detail-panel" style="display:none"><h4>航班列表 <small>(6个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>9C8917</td><td>春秋航空有限公司</td><td>06:40</td><td>08:55</td><td>A321</td><td></td><td>D08-D24</td><td>6号门</td></tr><tr><td>HO1881</td><td>上海吉祥航空股份有限公司</td><td>07:40</td><td>10:00</td><td>789</td><td></td><td>E01-E18</td><td>7号门</td></tr><tr><td>CZ3590</td><td>中国南方航空股份有限公司</td><td>07:55</td><td>10:15</td><td>327</td><td></td><td>D10-D18</td><td>6号门</td></tr><tr><td>FM9331</td><td>上海航空有限公司</td><td>08:05</td><td>10:30</td><td>333</td><td></td><td>B,C,D</td><td>6、7号门</td></tr><tr><td>MF8371</td><td>厦门航空有限公司</td><td>08:25</td><td>10:45</td><td>738</td><td></td><td>D01-D07</td><td>6号门</td></tr><tr><td>MU5331</td><td>中国东方航空股份有限公司</td><td>09:00</td><td>11:30</td><td>325</td><td></td><td>B,C,D</td><td>6、7号门</td></tr></table></div></div></div>/div></div><div class="region-section" style="display:none" data-region="日韩"><h3 class="region-title">日韩</h3><div class="cards-grid"></div></div><div class="region-section" style="display:none" data-region="港澳台"><h3 class="region-title">港澳台</h3><div class="cards-grid"></div></div><div class="transport-section"><h3 class="transport-title">🚗 机场交通 - 上海虹桥机场</h3><div class="loc-bar" data-airport="SHA"><button type="button" class="loc-btn" onclick="locateMe('SHA',this)">📍 定位我，实时算出到机场的距离与时间</button><div class="loc-result" style="display:none"></div></div><div class="transport-grid"><div class="transport-card"><h4>🚗 驾车/打车</h4><div class="transport-info"><div>距离: <strong>21.6km</strong></div><div>用时: <strong>53分钟</strong></div><div>预估费用: <strong>¥68</strong></div></div><a href="https://www.didiglobal.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🚕 滴滴打车</a> <a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn" style="margin-left:8px">🗺️ 高德导航</a></div><div class="transport-card"><h4>🚇 公共交通</h4><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案1</span><span>65分钟 · ¥5.0</span></div><div class="transit-steps">地铁2号线(浦东1号2号航站楼--蟠祥路·国家会计学院) → 步行879m → 步行1289m</div></div><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案2</span><span>66分钟 · ¥5.0</span></div><div class="transit-steps">地铁8号线(市光路--沈杜公路) → 步行515m → 地铁10号线(基隆路--虹桥火车站)</div></div><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案3</span><span>73分钟 · ¥6.0</span></div><div class="transit-steps">18路(鲁迅公园--南浦大桥站) → 步行430m → 地铁10号线(基隆路--虹桥火车站)</div></div><a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🗺️ 高德查询</a></div><div class="transport-card"><h4>🚇 地铁</h4><div class="transport-info"><div>🚇 <strong>地铁2号线</strong> 虹桥1号2号航站楼</div><div>🚇 <strong>地铁10号线</strong> 虹桥1号航站楼</div><div>运营时间：05:30-23:00</div><div>票价：<strong>¥5</strong></div></div><a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🗺️ 高德查询</a></div></div></div></div></div><div id="tab-PVG" class="airport-tab-content" style="display:none" role="tabpanel"><div class="search-bar"><input type="text" placeholder="搜索目的地城市或代码..." oninput="searchCards('PVG', this.value)" aria-label="搜索目的地"></div><div class="region-filters"><button class="region-btn active" onclick="filterRegion('PVG','all')">全部</button><button class="region-btn" onclick="filterRegion('PVG','国内')">国内</button><button class="region-btn" onclick="filterRegion('PVG','日韩')">日韩</button><button class="region-btn" onclick="filterRegion('PVG','港澳台')">港澳台</button><button class="region-btn" onclick="filterRegion('PVG','东南亚')">东南亚</button></div><div class="region-section" data-region="国内"><h3 class="region-title">国内</h3><div class="cards-grid"><div class="dest-card" onclick="openModal(this)" data-search="广州 CAN 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">广州</div><div class="dest-code">CAN</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥269</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ CZ3549 06:55</div><div class="card-meta"><span>机型:32J</span><span>准点:76.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=CAN&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-CAN" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>CZ3549</td><td>南航</td><td>06:55</td><td>09:15</td><td>32J</td><td>76.67%</td><td>B04-B16</td><td>21号门</td></tr><tr><td>HO1855</td><td>吉祥</td><td>07:05</td><td>09:35</td><td>32S</td><td>93.33%</td><td>L</td><td>28、29号门</td></tr><tr><td>HU7332</td><td>海航</td><td>08:00</td><td>10:40</td><td>738</td><td>66.67%</td><td>A03-A10</td><td>20号门</td></tr><tr><td>CA8327</td><td>国航</td><td>08:10</td><td>10:25</td><td>321</td><td>53.33%</td><td>K21-K29</td><td>28号门</td></tr><tr><td>FM9305</td><td>上航</td><td>09:00</td><td>11:30</td><td>73M</td><td>70.00%</td><td>A,C</td><td>1、4号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="杭州 HGH 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">杭州</div><div class="dest-code">HGH</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥290</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞1班</span></div></div><div class="flight-line">✈ MU6549 23:30</div><div class="card-meta"><span>机型:32N</span><span>准点:73.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=HGH&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-HGH" class="detail-panel" style="display:none"><h4>航班列表 <small>(1个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU6549</td><td>东航</td><td>23:30</td><td>00:40</td><td>32N</td><td>73.33%</td><td>A,B,D</td><td>1、2、4号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="沈阳 SHE 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">沈阳</div><div class="dest-code">SHE</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥288</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞24班</span></div></div><div class="card-meta"></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=SHE&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div></div><div class="dest-card" onclick="openModal(this)" data-search="青岛 TAO 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">青岛</div><div class="dest-code">TAO</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥258</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ HO2203 22:05</div><div class="card-meta"><span>机型:323</span><span>准点:93.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=TAO&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-TAO" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU6863</td><td>东航</td><td>06:25</td><td>07:55</td><td>323</td><td>93.33%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>HO1075</td><td>吉祥</td><td>06:40</td><td>08:30</td><td>32S</td><td>100.00%</td><td>L</td><td>28、29号门</td></tr><tr><td>HO2203</td><td>吉祥</td><td>07:15</td><td>09:00</td><td>32Q</td><td>100.00%</td><td>L</td><td>28、29号门</td></tr><tr><td>Y87503</td><td>金鹏</td><td>08:05</td><td>09:35</td><td>738</td><td>76.67%</td><td>A03-A11</td><td>20号门</td></tr><tr><td>MU5511</td><td>东航</td><td>10:50</td><td>12:30</td><td>32N</td><td>70.00%</td><td>A,B,D</td><td>1、2、4号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="大连 DLC 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">大连</div><div class="dest-code">DLC</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥259</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ 9C8981 12:55</div><div class="card-meta"><span>机型:320</span><span>准点:93.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=DLC&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-DLC" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU5627</td><td>东航</td><td>07:50</td><td>10:00</td><td>320</td><td>93.33%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>9C8843</td><td>春秋</td><td>08:00</td><td>09:55</td><td>A320</td><td>86.67%</td><td>M01-M12</td><td>29号门</td></tr><tr><td>HO1161</td><td>吉祥</td><td>08:05</td><td>09:50</td><td>32A</td><td>96.67%</td><td>L</td><td>28、29号门</td></tr><tr><td>FM9095</td><td>上航</td><td>09:35</td><td>11:20</td><td>73E</td><td>60.00%</td><td>A,C</td><td>1、4号门</td></tr><tr><td>CZ6522</td><td>南航</td><td>10:05</td><td>11:55</td><td>32N</td><td>86.67%</td><td>B04-B16</td><td>21号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="西安 XIY 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">西安</div><div class="dest-code">XIY</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥340</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ CZ5791 06:25</div><div class="card-meta"><span>机型:32N</span><span>准点:96.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=XIY&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-XIY" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU2335</td><td>东航</td><td>06:25</td><td>09:25</td><td>32N</td><td>96.67%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>CZ5791</td><td>南航</td><td>06:45</td><td>09:25</td><td>32J</td><td>93.33%</td><td>B04-B16</td><td>21号门</td></tr><tr><td>HO1047</td><td>吉祥</td><td>07:20</td><td>10:10</td><td>32S</td><td>70.00%</td><td>L</td><td>28、29号门</td></tr><tr><td>HO1009</td><td>吉祥</td><td>08:00</td><td>10:40</td><td>32S</td><td></td><td>L</td><td>28、29号门</td></tr><tr><td>CA8325</td><td>国航</td><td>08:30</td><td>11:00</td><td>321</td><td>73.33%</td><td>K21-K29</td><td>28号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="重庆 CKG 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">重庆</div><div class="dest-code">CKG</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥298</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ 9C8867 18:05</div><div class="card-meta"><span>机型:32N</span><span>准点:76.67%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=CKG&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-CKG" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>HO1249</td><td>吉祥</td><td>07:40</td><td>10:35</td><td>32N</td><td>76.67%</td><td>L</td><td>28、29号门</td></tr><tr><td>CA8543</td><td>国航</td><td>09:00</td><td>11:50</td><td>321</td><td>66.67%</td><td>K21-K29</td><td>28号门</td></tr><tr><td>MU5493</td><td>东航</td><td>09:35</td><td>12:35</td><td>31G</td><td>46.67%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>G54646</td><td>华夏</td><td>10:05</td><td>12:35</td><td>32A</td><td>42.86%</td><td>L</td><td>28号门</td></tr><tr><td>MU5427</td><td>东航</td><td>10:55</td><td>14:10</td><td>31G</td><td>66.67%</td><td>A,B,D</td><td>1、2、4号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="成都 CTU 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">成都</div><div class="dest-code">CTU</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥479</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ EU6678 07:20</div><div class="card-meta"><span>机型:359</span><span>准点:53.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=CTU&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-CTU" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>CA8557</td><td>国航</td><td>08:20</td><td>11:25</td><td>359</td><td>53.33%</td><td>K21-K29</td><td>28号门</td></tr><tr><td>MU5405</td><td>东航</td><td>09:15</td><td>12:15</td><td>359</td><td>36.67%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>CA4504</td><td>国航</td><td>11:25</td><td>14:40</td><td>32Q</td><td>36.67%</td><td>K21-K29</td><td>28号门</td></tr><tr><td>MU5419</td><td>东航</td><td>11:35</td><td>15:15</td><td>32N</td><td>46.67%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>MU5411</td><td>东航</td><td>11:35</td><td>15:15</td><td>325</td><td></td><td>A,B,D</td><td>1、2、4号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="北京 PEK 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">北京</div><div class="dest-code">PEK</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥400</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ CZ8881 07:50</div><div class="card-meta"><span>机型:325</span><span>准点:83.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=PEK&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-PEK" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>MU5151</td><td>东航</td><td>08:00</td><td>10:15</td><td>325</td><td>83.33%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>CA8332</td><td>国航</td><td>09:30</td><td>11:40</td><td>321</td><td>36.67%</td><td>K21-K29</td><td>28号门</td></tr><tr><td>MU5155</td><td>东航</td><td>10:30</td><td>13:00</td><td>32N</td><td>43.33%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>HU7614</td><td>海航</td><td>11:05</td><td>13:25</td><td>738</td><td>46.67%</td><td>A03-A10</td><td>20号门</td></tr><tr><td>MU5161</td><td>东航</td><td>16:15</td><td>18:25</td><td>919</td><td>16.67%</td><td>A,B,D</td><td>1、2、4号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="三亚 SYX 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">三亚</div><div class="dest-code">SYX</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥398</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ MU5397 21:30</div><div class="card-meta"><span>机型:738</span><span>准点:90.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=SYX&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-SYX" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>HU7322</td><td>海航</td><td>06:55</td><td>10:10</td><td>738</td><td>90.00%</td><td>A03-A10</td><td>20号门</td></tr><tr><td>MU5377</td><td>东航</td><td>09:30</td><td>13:05</td><td>320</td><td></td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>MU5373</td><td>东航</td><td>09:30</td><td>13:05</td><td>327</td><td>53.33%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>FM9539</td><td>上航</td><td>09:55</td><td>13:35</td><td>73M</td><td>56.67%</td><td>A,C</td><td>1、4号门</td></tr><tr><td>CZ6754</td><td>南航</td><td>12:40</td><td>16:00</td><td>32J</td><td>70.00%</td><td>B04-B16</td><td>21号门</td></tr></table></div></div></div><div class="dest-card" onclick="openModal(this)" data-search="昆明 KMG 🇨🇳"><div class="card-header"><div class="card-left"><span class="dest-flag">🇨🇳</span><div><div class="dest-city">昆明</div><div class="dest-code">KMG</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥416</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ HO1017 17:35</div><div class="card-meta"><span>机型:327</span><span>准点:70.00%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=KMG&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-KMG" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>CZ3677</td><td>南航</td><td>07:40</td><td>11:10</td><td>327</td><td>70.00%</td><td>B04-B16</td><td>21号门</td></tr><tr><td>MU5505</td><td>东航</td><td>08:35</td><td>14:50</td><td>323</td><td>80.00%</td><td>A,B,D</td><td>1、2、4号门</td></tr><tr><td>HO1099</td><td>吉祥</td><td>10:00</td><td>13:20</td><td>32S</td><td>66.67%</td><td>L</td><td>28、29号门</td></tr><tr><td>FM9465</td><td>上航</td><td>10:50</td><td>14:10</td><td>73E</td><td>73.33%</td><td>A,C</td><td>1、4号门</td></tr><tr><td>FM9429</td><td>上航</td><td>11:30</td><td>17:05</td><td>73L</td><td>66.67%</td><td>A,C</td><td>1、4号门</td></tr></table></div></div></div></div></div><div class="region-section" data-region="日韩"><h3 class="region-title">日韩</h3><div class="cards-grid"><div class="dest-card" onclick="openModal(this)" data-search="首尔 ICN 🇰🇷"><div class="card-header"><div class="card-left"><span class="dest-flag">🇰🇷</span><div><div class="dest-city">首尔</div><div class="dest-code">ICN</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥806</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞5班</span></div></div><div class="flight-line">✈ ZE872 09:10</div><div class="card-meta"><span>机型:738</span><span>准点:43.33%</span></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=ICN&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div><div id="detail-PVG-ICN" class="detail-panel" style="display:none"><h4>航班列表 <small>(5个航班)</small></h4><div class="table-wrap"><table class="flight-table"><tr><th>航班号</th><th>航司</th><th>起飞</th><th>到达</th><th>机型</th><th>准点率</th><th>值机</th><th>值机门</th></tr><tr><td>ZE872</td><td>易斯达</td><td>00:30</td><td>03:30</td><td>738</td><td>43.33%</td><td>E</td><td>22、23号门</td></tr><tr><td>OZ368</td><td>韩亚航空公司</td><td>01:05</td><td>04:05</td><td>32Q</td><td>93.33%</td><td>K1-K10</td><td>27、28号门</td></tr><tr><td>CZ313</td><td>南航</td><td>08:05</td><td>11:10</td><td>773</td><td>53.33%</td><td>B20-B24</td><td>21号门</td></tr><tr><td>KE892</td><td>大韩航空公司</td><td>08:50</td><td>11:55</td><td>781</td><td>36.67%</td><td>H</td><td>9号门</td></tr><tr><td>MU5041</td><td>东航</td><td>09:15</td><td>11:55</td><td>33L</td><td>50.00%</td><td>H,J,K,L</td><td>11号门</td></tr></table></div></div></div></div></div><div class="region-section" data-region="港澳台"><h3 class="region-title">港澳台</h3><div class="cards-grid"><div class="dest-card" onclick="openModal(this)" data-search="澳门 MFM 🇲🇴"><div class="card-header"><div class="card-left"><span class="dest-flag">🇲🇴</span><div><div class="dest-city">澳门</div><div class="dest-code">MFM</div></div></div><div class="card-right"><div class="price-area"><span class="price-badge" style="background:#b8860b18;color:#b8860b">¥410</span><span class="price-label" style="color:#b8860b">TripNow价</span></div><span class="direct-badge ">直飞9班</span></div></div><div class="card-meta"></div><div class="card-actions"><a href="https://www.fliggy.com/flight/international-search?depCity=PVG&arrCity=MFM&depDate=2026-09-10" target="_blank" rel="noopener noreferrer" class="btn-book">购票</a></div></div></div></div><div class="region-section" data-region="东南亚" style="display:none"><h3 class="region-title">东南亚</h3><div class="cards-grid"></div></div><div class="transport-section"><h3 class="transport-title">🚗 机场交通 - 上海浦东机场</h3><div class="loc-bar" data-airport="PVG"><button type="button" class="loc-btn" onclick="locateMe('PVG',this)">📍 定位我，实时算出到机场的距离与时间</button><div class="loc-result" style="display:none"></div></div><div class="transport-grid"><div class="transport-card"><h4>🚗 驾车/打车</h4><div class="transport-info"><div>距离: <strong>47.7km</strong></div><div>用时: <strong>1小时5分钟</strong></div><div>预估费用: <strong>¥166</strong></div></div><a href="https://www.didiglobal.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🚕 滴滴打车</a> <a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn" style="margin-left:8px">🗺️ 高德导航</a></div><div class="transport-card"><h4>🚇 公共交通</h4><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案1</span><span>113分钟 · ¥7.0</span></div><div class="transit-steps">地铁2号线(蟠祥路·国家会计学院--浦东1号2号航站楼) → 步行879m → 步行1848m</div></div><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案2</span><span>106分钟 · ¥54.0</span></div><div class="transit-steps">地铁8号线(市光路--沈杜公路) → 步行515m → 地铁7号线(美兰湖--花木路)</div></div><div class="transit-option"><div class="transit-header"><span class="transit-idx">方案3</span><span>168分钟 · ¥28.0</span></div><div class="transit-steps">537路(老西门--开鲁路白城路) → 步行390m → 机场四线(上海火车站(北广场)--浦东国际机场2号航站楼)</div></div><a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🗺️ 高德查询</a></div><div class="transport-card"><h4>🚇 地铁</h4><div class="transport-info"><div>🚇 <strong>地铁2号线</strong> 直达浦东1号2号航站楼</div><div>🚄 <strong>磁浮线</strong> 龙阳路→浦东机场（8min）</div><div>运营时间：06:00-22:30</div><div>票价：地铁<strong>¥5</strong> | 磁浮<strong>¥50</strong>（单程）</div></div><a href="https://ditu.amap.com/" target="_blank" rel="noopener noreferrer" class="nav-btn">🗺️ 高德查询</a></div></div></div></div></div><div id="tab-boomerang" class="airport-tab-content" style="display:none" role="tabpanel"><div class="boomerang-intro"><h2>🪃 回旋镖航线</h2><p>经 TripNow 验证的真实直飞多段组合，标注航班号与各段票价。起降机场可不同（均为长三角四机场之一），以实现最低总价。基于2026年9月10日查询最低含税价。</p></div>
+
+<h3 style="color:var(--gold);padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px">✈️ 两程回旋 (≤¥1000)</h3>
+<div class="boomerang-routes">
+<div class="boomerang-card" data-airport="PVG"><h3>🪃 浦东·岭南虹桥线</h3>
+<div class="route-path">PVG → CAN → SHA</div>
+<div class="route-flights">
+<span class="flight-tag" data-card="T2_2" data-seg="0" onclick="openSegmentDetail(this,event)">AQ1006</span>
+<span class="flight-arrow">→</span>
+<span class="flight-tag" data-card="T2_2" data-seg="1" onclick="openSegmentDetail(this,event)">9C6722</span>
+</div>
+<div class="route-cities"><span>上海浦东</span><span>广州</span><span>上海虹桥</span></div>
+<div class="route-info"><span class="route-price">总价 ¥749</span><span class="route-segments">¥280 + ¥469</span></div>
+<a href="https://www.fliggy.com/" target="_blank" rel="noopener noreferrer" class="btn-book-lg">去飞猪购票 🛫</a>
+</div>
+<div class="boomerang-card" data-airport="WUX"><h3>🪃 无锡·岭南快线</h3>
+<div class="route-path">WUX → CAN → SHA</div>
+<div class="route-flights">
+<span class="flight-tag" data-card="T2_3" data-seg="0" onclick="openSegmentDetail(this,event)">AQ1056</span>
+<span class="flight-arrow">→</span>
+<span class="flight-tag" data-card="T2_3" data-seg="1" onclick="openSegmentDetail(this,event)">9C6722</span>
+</div>
+<div class="route-cities"><span>无锡</span><span>广州</span><span>上海虹桥</span></div>
+<div class="route-info"><span class="route-price">总价 ¥958</span><span class="route-segments">¥489 + ¥469</span></div>
+<a href="https://www.fliggy.com/" target="_blank" rel="noopener noreferrer" class="btn-book-lg">去飞猪购票 🛫</a>
+</div>
+</div>
+
+<h3 style="color:var(--gold);padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px;margin-top:24px">🏠 三程回旋 (≤¥1500)</h3><div class="boomerang-routes">
+<div class="boomerang-card" data-airport="SHA">
+<h3>🪃 虹桥·西南穿越</h3>
+<div class="route-path">SHA → KMG → CKG → CZX</div>
+<div class="route-flights">
+<span class="flight-tag" data-card="SHA" data-seg="0" onclick="openSegmentDetail(this,event)">9C8953</span>
+<span class="flight-arrow">→</span>
+<span class="flight-tag" data-card="SHA" data-seg="1" onclick="openSegmentDetail(this,event)">CZ2120</span>
+<span class="flight-arrow">→</span>
+<span class="flight-tag" data-card="SHA" data-seg="2" onclick="openSegmentDetail(this,event)">3U8097</span>
+</div>
+<div class="route-cities"><span>上海虹桥</span><span>昆明</span><span>重庆</span><span>常州</span></div>
+<div class="route-info"><span class="route-price">总价 ¥1049</span><span class="route-segments">¥299 + ¥330 + ¥420</span></div>
+<a href="https://www.fliggy.com/" target="_blank" rel="noopener noreferrer" class="btn-book-lg">去飞猪购票 🛫</a>
+</div>
+<div class="boomerang-card" data-airport="PVG">
+<h3>🪃 浦东·岭南环线</h3>
+<div class="route-path">PVG → CAN → CKG → PVG</div>
+<div class="route-flights">
+<span class="flight-tag" data-card="PVG" data-seg="0" onclick="openSegmentDetail(this,event)">AQ1006</span>
+<span class="flight-arrow">→</span>
+<span class="flight-tag" data-card="PVG" data-seg="1" onclick="openSegmentDetail(this,event)">CZ9098</span>
+<span class="flight-arrow">→</span>
+<span class="flight-tag" data-card="PVG" data-seg="2" onclick="openSegmentDetail(this,event)">9C6154</span>
+</div>
+<div class="route-cities"><span>上海浦东</span><span>广州</span><span>重庆</span><span>上海浦东</span></div>
+<div class="route-info"><span class="route-price">总价 ¥1345</span><span class="route-segments">¥280 + ¥550 + ¥515</span></div>
+<a href="https://www.fliggy.com/" target="_blank" rel="noopener noreferrer" class="btn-book-lg">去飞猪购票 🛫</a>
+</div>
+<div class="boomerang-card" data-airport="CZX">
+<h3>🪃 常州·西南三角</h3>
+<div class="route-path">CZX → KMG → CKG → CZX</div>
+<div class="route-flights">
+<span class="flight-tag" data-card="CZX" data-seg="0" onclick="openSegmentDetail(this,event)">KY3224</span>
+<span class="flight-arrow">→</span>
+<span class="flight-tag" data-card="CZX" data-seg="1" onclick="openSegmentDetail(this,event)">CZ2120</span>
+<span class="flight-arrow">→</span>
+<span class="flight-tag" data-card="CZX" data-seg="2" onclick="openSegmentDetail(this,event)">3U8097</span>
+</div>
+<div class="route-cities"><span>常州</span><span>昆明</span><span>重庆</span><span>常州</span></div>
+<div class="route-info"><span class="route-price">总价 ¥1428</span><span class="route-segments">¥678 + ¥330 + ¥420</span></div>
+<a href="https://www.fliggy.com/" target="_blank" rel="noopener noreferrer" class="btn-book-lg">去飞猪购票 🛫</a>
+</div>
+</div>
+
+<h3 id="boom-intl-title" style="color:var(--gold);padding:12px 0;border-bottom:1px solid var(--border);margin-bottom:16px;display:none">🌏 国际回旋 (≤¥2000)</h3><div class="boomerang-routes" id="boom-intl-routes" style="display:none"></div></div
+<div id="tab-favorites" class="airport-tab-content" style="display:none" role="tabpanel">
+<h3 style="margin:16px 0 12px;padding:0 16px;font-size:1.1rem">⭐ 我的收藏航线</h3>
+<div id="favorites-list" style="padding:0 16px 20px">
+<div class="fav-empty" id="favorites-empty">
+<div class="fav-empty-icon">⭐</div>
+<p>还没有收藏航线</p>
+<p style="font-size:0.8rem">点击卡片右上角的☆即可收藏</p>
+</div>
+</div>
+</div>
+><div id="flightModal" class="modal-overlay" onclick="closeModalOverlay(event)" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+<div class="modal-dialog">
+<div class="modal-header">
+<h3 class="modal-title" id="modalTitle"></h3>
+<button class="modal-close" onclick="closeModal()" aria-label="关闭">&times;</button>
+</div>
+<div class="modal-body" id="modalBody"></div>
+<div class="modal-footer" id="modalFooter"></div>
+</div>
+</div>
+<script>
+function switchTab(tabId) {
+  document.querySelectorAll('.airport-tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.ap-tab').forEach(el => {
+    el.classList.remove('active');
+    el.setAttribute('aria-selected', 'false');
+  });
+  const tab = document.getElementById('tab-' + tabId);
+  if (tab) tab.style.display = 'block';
+  var tabBtn = document.getElementById('apt-tab-' + tabId);
+  if (tabBtn) {
+    tabBtn.classList.add('active');
+    tabBtn.setAttribute('aria-selected', 'true');
+  }
+}
+
+function openModal(card) {
+  if (!card) return;
+  // Ignore if click was on a button or link inside the card
+  if (event && (event.target.closest('.btn-book') || event.target.closest('.btn-buy') || event.target.closest('.btn-book-lg') || event.target.closest('a'))) return;
+  var city = card.querySelector('.dest-city').textContent;
+  var code = card.querySelector('.dest-code').textContent;
+  var panel = card.querySelector('.detail-panel');
+  var bookLink = card.querySelector('.btn-book');
+  var bookHref = bookLink ? bookLink.href : '#';
+  document.getElementById('modalTitle').innerHTML = city + ' <small>' + code + '</small>';
+  var body = document.getElementById('modalBody');
+  body.innerHTML = panel ? panel.innerHTML : '<p style="color:var(--text-muted)">暂无航班详情</p>';
+  document.getElementById('modalFooter').innerHTML = '<a href="' + bookHref + '" target="_blank" rel="noopener noreferrer" class="btn-book">去飞猪购票 \ud83d\udeeb</a>';
+  document.getElementById('flightModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('flightModal').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function closeModalOverlay(e) {
+  if (e.target === e.currentTarget) closeModal();
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+function searchCards(ap, query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll(`#tab-${ap} .dest-card`).forEach(card => {
+    const search = card.dataset.search.toLowerCase();
+    card.style.display = search.includes(q) ? '' : 'none';
+  });
+  document.querySelectorAll(`#tab-${ap} .region-section`).forEach(el => {
+    if (el.style.display === 'none') return;
+    const cards = el.querySelectorAll('.dest-card');
+    let hasVisible = false;
+    cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
+    let placeholder = el.querySelector('.empty-placeholder');
+    if (!hasVisible && cards.length > 0) {
+      if (!placeholder) {
+        placeholder = document.createElement('div');
+        placeholder.className = 'empty-placeholder';
+        placeholder.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:0.95rem">✈️ 暂无航班</div>';
+        const grid = el.querySelector('.cards-grid');
+        if (grid) grid.appendChild(placeholder);
+      }
+      placeholder.style.display = 'block';
+    } else if (placeholder) {
+      placeholder.style.display = 'none';
+    }
+  });
+}
+
+function filterRegion(ap, region) {
+  document.querySelectorAll(`#tab-${ap} .region-section`).forEach(el => {
+    const show = (region === 'all' || el.dataset.region === region);
+    el.style.display = show ? 'block' : 'none';
+    if (show) {
+      const cards = el.querySelectorAll('.dest-card');
+      let hasVisible = false;
+      cards.forEach(c => { if (c.style.display !== 'none') hasVisible = true; });
+      let placeholder = el.querySelector('.empty-placeholder');
+      if (!hasVisible || cards.length === 0) {
+        if (!placeholder) {
+          placeholder = document.createElement('div');
+          placeholder.className = 'empty-placeholder';
+          placeholder.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary);font-size:0.95rem">✈️ 暂无航班</div>';
+          const grid = el.querySelector('.cards-grid');
+          if (grid) grid.appendChild(placeholder);
+        }
+        placeholder.style.display = 'block';
+      } else if (placeholder) {
+        placeholder.style.display = 'none';
+      }
+    }
+  });
+  document.querySelectorAll(`#tab-${ap} .region-btn`).forEach(btn => {
+    btn.classList.remove('active');
+    if ((region === 'all' && btn.textContent === '全部') || btn.textContent === region) {
+      btn.classList.add('active');
+    }
+  });
+}
+
+// 自动隐藏空地区的筛选标签和区块
+function hideEmptyRegions() {
+  var airports = ['CZX', 'WUX', 'SHA', 'PVG'];
+  airports.forEach(function(ap) {
+    var tab = document.getElementById('tab-' + ap);
+    if (!tab) return;
+    var sections = tab.querySelectorAll('.region-section');
+    var emptyRegions = [];
+    // 收集空地区（无卡片或section不存在的地区）
+    sections.forEach(function(sec) {
+      var cards = sec.querySelectorAll('.dest-card');
+      if (cards.length === 0) {
+        sec.style.display = 'none';
+        emptyRegions.push(sec.dataset.region);
+      }
+    });
+    // 隐藏对应筛选按钮（包括section不存在的地区）
+    var btns = tab.querySelectorAll('.region-filters .region-btn');
+    btns.forEach(function(btn) {
+      var regionName = btn.textContent.trim();
+      if (regionName === '全部') return;
+      var section = tab.querySelector('.region-section[data-region="' + regionName + '"]');
+      if (!section || section.querySelectorAll('.dest-card').length === 0) {
+        btn.style.display = 'none';
+        if (emptyRegions.indexOf(regionName) === -1) {
+          emptyRegions.push(regionName);
+        }
+      }
+    });
+    // 如果只有一个地区有内容，隐藏全部地区按钮（无意义）
+    var visibleRegions = 0;
+    btns.forEach(function(btn) {
+      if (btn.style.display !== 'none' && btn.textContent.trim() !== '全部') {
+        visibleRegions++;
+      }
+    });
+    if (visibleRegions <= 1) {
+      btns.forEach(function(btn) {
+        if (btn.textContent.trim() === '全部') btn.style.display = 'none';
+      });
+    }
+  });
+}
+
+// Show first tab on load
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('tab-CZX').style.display = 'block';
+  hideEmptyRegions();
+});
+
+// Theme switching (circular button)
+(function() {
+  const root = document.documentElement;
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const btn = document.getElementById('themeToggleBtn');
+  const icons = { light: '\uD83C\uDF19', dark: '\u2600\uFE0F', system: '\uD83D\uDCBB' };
+  const cycle = { light: 'dark', dark: 'system', system: 'light' };
+
+  function applyTheme(mode) {
+    if (mode === 'dark') {
+      root.dataset.theme = 'dark';
+    } else if (mode === 'light') {
+      root.dataset.theme = 'light';
+    } else {
+      delete root.dataset.theme;
+      if (mq.matches) root.dataset.theme = 'dark';
+    }
+    btn.textContent = icons[mode] || icons.system;
+    btn.setAttribute('aria-label', mode === 'light' ? '浅色模式' : mode === 'dark' ? '深色模式' : '跟随系统');
+  }
+
+  function getStored() { return localStorage.getItem('theme-mode') || 'system'; }
+
+  // Init
+  applyTheme(getStored());
+
+  // Click to cycle: light → dark → system → light
+  btn.addEventListener('click', function() {
+    var current = getStored();
+    var next = cycle[current] || 'light';
+    localStorage.setItem('theme-mode', next);
+    applyTheme(next);
+  });
+
+  // Listen to system changes
+  mq.addEventListener('change', function() {
+    if (getStored() === 'system') applyTheme('system');
+  });
+})();
+
+
+
+// ====== 价格走势/历史低价标注 ======
+function getPriceHistory() {
+  try { return JSON.parse(localStorage.getItem('flight-price-history') || '{}'); }
+  catch(e) { return {}; }
+}
+
+function savePriceHistory(history) {
+  try { localStorage.setItem('flight-price-history', JSON.stringify(history)); } catch(e) {}
+}
+
+function getTodayStr() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function recordPrice(airport, destCode, price) {
+  var history = getPriceHistory();
+  var key = airport + '-' + destCode;
+  var today = getTodayStr();
+  if (!history[key]) history[key] = {};
+  history[key][today] = price;
+  // 只保留最近30天
+  var dates = Object.keys(history[key]).sort();
+  if (dates.length > 30) {
+    dates.slice(0, dates.length - 30).forEach(function(d) { delete history[key][d]; });
+  }
+  savePriceHistory(history);
+}
+
+function getTrendBadge(airport, destCode, currentPrice) {
+  var history = getPriceHistory();
+  var key = airport + '-' + destCode;
+  if (!history[key]) return '';
+  
+  var dates = Object.keys(history[key]).sort();
+  if (dates.length < 2) return '';
+  
+  var prices = dates.map(function(d) { return parseInt(history[key][d]); });
+  var yesterday = prices[prices.length - 2];
+  var minPrice = Math.min.apply(null, prices);
+  
+  var badges = [];
+  if (yesterday > 0 && currentPrice < yesterday) {
+    badges.push('<span class="price-trend down">↓¥' + (yesterday - currentPrice) + '</span>');
+  } else if (yesterday > 0 && currentPrice > yesterday) {
+    badges.push('<span class="price-trend up">↑¥' + (currentPrice - yesterday) + '</span>');
+  }
+  if (currentPrice <= minPrice && prices.length >= 3) {
+    badges.push('<span class="price-trend lowest">近' + prices.length + '日最低</span>');
+  }
+  return badges.join('');
+}
+
+function initPriceTrends() {
+  var airports = ['CZX', 'WUX', 'SHA', 'PVG'];
+  airports.forEach(function(ap) {
+    var tab = document.getElementById('tab-' + ap);
+    if (!tab) return;
+    tab.querySelectorAll('.dest-card').forEach(function(card) {
+      var priceEl = card.querySelector('.price-badge');
+      var destCodeEl = card.querySelector('.dest-code');
+      if (!priceEl || !destCodeEl) return;
+      var priceText = priceEl.textContent.trim().replace(/¥/g, '');
+      var price = parseInt(priceText);
+      if (isNaN(price)) return;
+      var destCode = destCodeEl.textContent.trim();
+      
+      // 记录今日价格
+      recordPrice(ap, destCode, price);
+      
+      // 显示走势标签
+      var badge = getTrendBadge(ap, destCode, price);
+      if (badge) {
+        var priceArea = card.querySelector('.price-area');
+        if (priceArea && !priceArea.querySelector('.price-trend')) {
+          var labelEl = priceArea.querySelector('.price-label');
+          if (labelEl) {
+            var wrap = document.createElement('div');
+            wrap.innerHTML = badge;
+            labelEl.appendChild(wrap.firstChild);
+          }
+        }
+      }
+    });
+  });
+}
+
+// ====== 购票链接日期动态化 ======
+function updateBookLinksDate() {
+  var today = new Date();
+  // 默认查后天（给用户留出行准备时间）
+  var d = new Date(today);
+  d.setDate(d.getDate() + 2);
+  var dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  document.querySelectorAll('.btn-book').forEach(function(btn) {
+    var href = btn.getAttribute('href');
+    if (href && href.indexOf('depDate=') > -1) {
+      btn.setAttribute('href', href.replace(/depDate=\d{4}-\d{2}-\d{2}/, 'depDate=' + dateStr));
+    }
+  });
+}
+
+// ====== 分享功能 ======
+function showShareToast(msg) {
+  var toast = document.getElementById('share-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'share-toast';
+    toast.className = 'share-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 2000);
+}
+
+function shareFlight(dep, arr, price) {
+  var title = dep + '→' + arr + ' 特价机票 ¥' + price;
+  var text = title + ' | 长三角全球特价航班速查';
+  var url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: title, text: text, url: url }).catch(function() {});
+  } else {
+    // 复制到剪贴板
+    var copyText = title + ' ' + url;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(copyText).then(function() {
+        showShareToast('已复制到剪贴板');
+      }).catch(function() {
+        showShareToast('分享链接：' + url);
+      });
+    } else {
+      showShareToast('分享链接：' + url);
+    }
+  }
+}
+
+// ====== 收藏功能 ======
+function getFavorites() {
+  try { return JSON.parse(localStorage.getItem('flight-favorites') || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveFavorites(list) {
+  localStorage.setItem('flight-favorites', JSON.stringify(list));
+}
+
+function toggleFavorite(airport, destCode, destCity) {
+  var key = airport + '-' + destCode;
+  var favs = getFavorites();
+  var idx = favs.findIndex(function(f) { return f.key === key; });
+  if (idx > -1) {
+    favs.splice(idx, 1);
+    updateFavIcon(airport, destCode, false);
+    showShareToast('已取消收藏');
+  } else {
+    favs.push({ key: key, airport: airport, dest: destCode, city: destCity });
+    updateFavIcon(airport, destCode, true);
+    showShareToast('已收藏');
+  }
+  saveFavorites(favs);
+  return idx === -1;
+}
+
+function updateFavIcon(airport, destCode, isFav) {
+  var btn = document.querySelector('[data-fav="' + airport + '-' + destCode + '"]');
+  if (btn) {
+    btn.textContent = isFav ? '⭐' : '☆';
+    btn.classList.toggle('favorited', isFav);
+    btn.setAttribute('aria-pressed', isFav ? 'true' : 'false');
+  }
+}
+
+function initFavorites() {
+  var favs = getFavorites();
+  var favMap = {};
+  favs.forEach(function(f) { favMap[f.key] = true; });
+  // 给所有dest-card加收藏按钮
+  var airports = ['CZX', 'WUX', 'SHA', 'PVG'];
+  airports.forEach(function(ap) {
+    var tab = document.getElementById('tab-' + ap);
+    if (!tab) return;
+    tab.querySelectorAll('.dest-card').forEach(function(card) {
+      if (card.querySelector('.fav-btn')) return; // 已加过
+      var destCodeEl = card.querySelector('.dest-code');
+      var destCityEl = card.querySelector('.dest-city');
+      if (!destCodeEl) return;
+      var destCode = destCodeEl.textContent.trim();
+      var destCity = destCityEl ? destCityEl.textContent.trim() : '';
+      var key = ap + '-' + destCode;
+      var btn = document.createElement('button');
+      btn.className = 'fav-btn' + (favMap[key] ? ' favorited' : '');
+      btn.setAttribute('data-fav', key);
+      btn.setAttribute('aria-label', '收藏' + destCity);
+      btn.setAttribute('aria-pressed', favMap[key] ? 'true' : 'false');
+      btn.textContent = favMap[key] ? '⭐' : '☆';
+      btn.onclick = function(e) {
+        e.stopPropagation();
+        toggleFavorite(ap, destCode, destCity);
+      };
+      card.appendChild(btn);
+    });
+  });
+}
+
+
+// ====== 我的收藏Tab功能 ======
+var _lastActiveTab = 'CZX'; // 记录进入收藏前的tab
+
+function switchFavTab() {
+  // 记录当前激活的tab（如果不是收藏）
+  var currentActive = null;
+  document.querySelectorAll('.ap-tab').forEach(function(btn) {
+    if (btn.classList.contains('active') && btn.id !== 'apt-tab-favorites') {
+      currentActive = btn.id.replace('apt-tab-', '');
+    }
+  });
+  if (currentActive) _lastActiveTab = currentActive;
+  
+  // 隐藏所有tab内容
+  document.querySelectorAll('.airport-tab-content').forEach(function(el) {
+    el.style.display = 'none';
+  });
+  // 取消所有tab按钮激活
+  document.querySelectorAll('.ap-tab').forEach(function(el) {
+    el.classList.remove('active');
+    el.setAttribute('aria-selected', 'false');
+  });
+  
+  // 显示收藏tab
+  var favTab = document.getElementById('tab-favorites');
+  if (favTab) favTab.style.display = 'block';
+  var favBtn = document.getElementById('apt-tab-favorites');
+  if (favBtn) {
+    favBtn.classList.add('active');
+    favBtn.setAttribute('aria-selected', 'true');
+  }
+  
+  renderFavorites();
+}
+
+function renderFavorites() {
+  var listEl = document.getElementById('favorites-list');
+  var emptyEl = document.getElementById('favorites-empty');
+  if (!listEl) return;
+  
+  var favs = getFavorites();
+  
+  // 清空现有内容（保留empty）
+  var existingCards = listEl.querySelectorAll('.dest-card');
+  existingCards.forEach(function(c) { c.remove(); });
+  
+  if (favs.length === 0) {
+    if (emptyEl) emptyEl.style.display = 'block';
+    return;
+  }
+  if (emptyEl) emptyEl.style.display = 'none';
+  
+  // 按机场分组
+  var byAirport = {};
+  favs.forEach(function(f) {
+    if (!byAirport[f.airport]) byAirport[f.airport] = [];
+    byAirport[f.airport].push(f);
+  });
+  
+  var airportOrder = ['CZX', 'WUX', 'SHA', 'PVG'];
+  var airportNames = { CZX: '常州奔牛', WUX: '无锡硕放', SHA: '上海虹桥', PVG: '上海浦东' };
+  
+  airportOrder.forEach(function(ap) {
+    if (!byAirport[ap]) return;
+    
+    // 加机场分组标题
+    var group = document.createElement('div');
+    group.style.marginBottom = '16px';
+    
+    var title = document.createElement('h4');
+    title.style.cssText = 'margin:16px 0 10px;font-size:0.95rem;color:var(--text-secondary);border-bottom:1px solid var(--border);padding-bottom:6px';
+    title.textContent = airportNames[ap] + ' (' + byAirport[ap].length + '条)';
+    group.appendChild(title);
+    
+    var grid = document.createElement('div');
+    grid.className = 'cards-grid';
+    
+    byAirport[ap].forEach(function(f) {
+      // 从原tab中克隆对应的卡片
+      var srcTab = document.getElementById('tab-' + ap);
+      if (!srcTab) return;
+      var cards = srcTab.querySelectorAll('.dest-card');
+      for (var i = 0; i < cards.length; i++) {
+        var codeEl = cards[i].querySelector('.dest-code');
+        if (codeEl && codeEl.textContent.trim() === f.dest) {
+          var clone = cards[i].cloneNode(true);
+          // 修复onclick - 模态框数据是全局的，应该能用
+          // 修复收藏按钮的绑定
+          var favBtnClone = clone.querySelector('.fav-btn');
+          if (favBtnClone) {
+            (function(airport, dest, city) {
+              favBtnClone.onclick = function(e) {
+                e.stopPropagation();
+                toggleFavorite(airport, dest, city);
+                // 如果取消了，重新渲染
+                var newFavs = getFavorites();
+                var stillFav = newFavs.some(function(x) { return x.key === airport + '-' + dest; });
+                if (!stillFav) renderFavorites();
+              };
+            })(ap, f.dest, f.city);
+          }
+          grid.appendChild(clone);
+          break;
+        }
+      }
+    });
+    
+    group.appendChild(grid);
+    listEl.appendChild(group);
+  });
+  
+  // 如果所有收藏的卡片都找不到（比如数据更新后航线没了）
+  var totalCards = listEl.querySelectorAll('.dest-card').length;
+  if (totalCards === 0 && favs.length > 0) {
+    if (emptyEl) {
+      emptyEl.style.display = 'block';
+      emptyEl.querySelector('p').textContent = '收藏的航线暂无可查价格';
+    }
+  }
+}
+
+function updateFavTabCount() {
+  var favs = getFavorites();
+  var countEl = document.getElementById('fav-tab-count');
+  if (countEl) countEl.textContent = favs.length;
+}
+
+// 覆盖toggleFavorite，收藏变化时更新顶部计数
+var _origToggleFavorite2 = toggleFavorite;
+toggleFavorite = function(airport, destCode, destCity) {
+  var result = _origToggleFavorite2(airport, destCode, destCity);
+  updateFavTabCount();
+  // 如果在收藏tab，重新渲染
+  var favTab = document.getElementById('tab-favorites');
+  if (favTab && favTab.style.display !== 'none') {
+    renderFavorites();
+  }
+  return result;
+};
+
+
+// ====== 骨架屏加载 ======
+function removeSkeletons() {
+  document.querySelectorAll('.skeleton').forEach(function(el) {
+    el.classList.remove('skeleton');
+    el.classList.remove('skeleton-price');
+    el.classList.remove('skeleton-line');
+  });
+}
+
+// ====== 初始化 ======
+document.addEventListener('DOMContentLoaded', function() {
+  updateBookLinksDate();
+  initPriceTrends();
+  initFavorites();
+  updateFavTabCount();
+  setTimeout(removeSkeletons, 300);
+});
+
+// 兼容：如果DOMContentLoaded已过，立即执行
+if (document.readyState !== 'loading') {
+  setTimeout(function() {
+    updateBookLinksDate();
+    initPriceTrends();
+    initFavorites();
+    updateFavTabCount();
+    removeSkeletons();
+  }, 50);
+}
+
+</script>
+
+<script>
+(function(){
+  var AMAP_KEY='AF00aXg9Zg8ZtSl5nVarYTTDifznq22N';
+  var AIRPORTS={
+    CZX:{lng:119.7794,lat:31.9185,name:'常州奔牛'},
+    WUX:{lng:120.4291,lat:31.4943,name:'无锡硕放'},
+    SHA:{lng:121.3364,lat:31.1979,name:'上海虹桥'},
+    PVG:{lng:121.8081,lat:31.1434,name:'上海浦东'}
+  };
+  var __loc=null;
+
+  function wgs2gcj(lng,lat){
+    var a=6378245.0,ee=0.00669342162296594323;
+    function tlat(x,y){var r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));
+      r+=(20*Math.sin(6*x*Math.PI)+20*Math.sin(2*x*Math.PI))*2/3;
+      r+=(20*Math.sin(y*Math.PI)+40*Math.sin(y/3*Math.PI))*2/3;
+      r+=(160*Math.sin(y/12*Math.PI)+320*Math.sin(y*Math.PI/30))*2/3;return r;}
+    function tlng(x,y){var r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));
+      r+=(20*Math.sin(6*x*Math.PI)+20*Math.sin(2*x*Math.PI))*2/3;
+      r+=(20*Math.sin(x*Math.PI)+40*Math.sin(x/3*Math.PI))*2/3;
+      r+=(150*Math.sin(x/12*Math.PI)+300*Math.sin(x/30*Math.PI))*2/3;return r;}
+    var dlat=tlat(lng-105,lat-35),dlng=tlng(lng-105,lat-35);
+    var radlat=lat*Math.PI/180;
+    var magic=Math.sin(radlat);magic=1-ee*magic*magic;
+    var sq=Math.sqrt(magic);
+    dlat=dlat*180/((a*(1-ee))/(magic*sq)*Math.PI);
+    dlng=dlng*180/(a/sq*Math.PI);
+    return {lng:lng+dlng,lat:lat+dlat};
+  }
+
+  function jsonp(url){
+    return new Promise(function(res,rej){
+      var cb='__amapcb_'+Math.random().toString(36).slice(2);
+      var s=document.createElement('script');
+      var done=false;
+      window[cb]=function(d){done=true;resolve(d);cleanup();};
+      s.onerror=function(){if(!done){rej(new Error('network'));cleanup();}};
+      function cleanup(){try{delete window[cb];}catch(e){window[cb]=undefined;}if(s.parentNode)s.parentNode.removeChild(s);}
+      s.src=url+'&callback='+cb;
+      document.body.appendChild(s);
+      setTimeout(function(){if(!done){rej(new Error('timeout'));cleanup();}},12000);
+    });
+  }
+
+  function fmtKm(m){return m>=1000?(m/1000).toFixed(1)+' km':Math.round(m)+' m';}
+  function fmtDur(s){var m=Math.round(s/60);if(m<60)return m+'分钟';var h=Math.floor(m/60);return h+'小时'+(m%60?m%60+'分钟':'');}
+
+  window.locateMe=function(ap,btn){
+    if(__loc){renderAll();return;}
+    var bar=btn.closest?btn.closest('.loc-bar'):btn.parentNode;
+    btn.disabled=true;btn.textContent='⏳ 正在获取定位… 请在浏览器弹窗中点击「允许」';
+    if(!navigator.geolocation){fail(bar,'当前浏览器不支持定位，请用手机浏览器打开或更换Chrome/Edge。');return;}
+    navigator.geolocation.getCurrentPosition(function(pos){
+      btn.textContent='⏳ 定位成功，正在查询到4个机场的实时路线…';
+      var g=wgs2gcj(pos.coords.longitude,pos.coords.latitude);
+      var acc=Math.round(pos.coords.accuracy||0);
+      var loc=g.lng.toFixed(6)+','+g.lat.toFixed(6);
+      jsonp('https://restapi.amap.com/v3/geocode/regeo?key='+AMAP_KEY+'&location='+loc+'&extensions=base&output=json&radius=1000&poitype=')
+      .then(function(rd){
+        var addr='';
+        try{
+          var c=rd.regeocode.addressComponent;
+          var city=(c.city&&c.city.length)?c.city:(c.province||'');
+          var parts=[];
+          if(c.district)parts.push(c.district);
+          if(c.township)parts.push(c.township);
+          if(c.neighborhood&&c.neighborhood.name&&c.neighborhood.name.length)parts.push(c.neighborhood.name);
+          addr=parts.length?city+parts.join(' · '):(rd.regeocode.formatted_address||'未知位置');
+        }catch(e){addr='已定位（地址解析失败）';}
+        var codes=['CZX','WUX','SHA','PVG'];
+        Promise.all(codes.map(function(code){
+          var a=AIRPORTS[code];
+          return jsonp('https://restapi.amap.com/v3/direction/driving?key='+AMAP_KEY+'&origin='+loc+'&destination='+a.lng+','+a.lat+'&output=json&strategy=0')
+            .then(function(d){
+              if(d.status!=='1'||!d.route||!d.route.paths||!d.route.paths.length)return {code:code,dist:null,dur:null,cost:null};
+              var p=d.route.paths[0];
+              return {code:code,dist:+p.distance,dur:+p.duration,cost:p.taxi_cost?Math.round(+p.taxi_cost):null};
+            })
+            .catch(function(){return {code:code,dist:null,dur:null,cost:null};});
+        })).then(function(rows){
+          __loc={addr:addr,acc:acc,rows:rows};
+          renderAll();
+        });
+      }).catch(function(){fail(bar,'高德地图查询失败，请检查网络后重试。');});
+    },function(err){
+      var msg;
+      if(err.code===1)msg='❌ 定位权限被拒绝。请点击浏览器地址栏左侧的锁/定位图标，允许定位后重试。';
+      else if(err.code===3)msg='❌ 定位超时。手机请在室外或靠近窗户处重试，电脑可尝试连接手机热点。';
+      else msg='❌ 定位失败：'+(err.message||'未知错误')+'。提示：本地文件方式打开时部分浏览器会限制定位，在线托管页面可正常使用。';
+      fail(bar,msg);
+    },{enableHighAccuracy:true,timeout:12000,maximumAge:300000});
+  };
+
+  function fail(bar,msg){
+    var btn=bar.querySelector('.loc-btn');
+    btn.disabled=false;btn.textContent='📍 重新定位';
+    var box=bar.querySelector('.loc-result');
+    box.style.display='block';box.innerHTML='<div class="loc-err">'+msg+'</div>';
+  }
+
+  window.resetLoc=function(){
+    __loc=null;
+    document.querySelectorAll('.loc-bar').forEach(function(bar){
+      var btn=bar.querySelector('.loc-btn');
+      btn.disabled=false;btn.style.display='block';btn.textContent='📍 定位我，实时算出到机场的距离与时间';
+      var box=bar.querySelector('.loc-result');box.style.display='none';box.innerHTML='';
+      var card=bar.parentNode.querySelectorAll('.transport-card')[0];
+      if(card){card.querySelectorAll('.transport-info strong').forEach(function(s){
+        s.textContent=s.textContent.replace('（实时路况）','').replace('（实时预估）','').replace('（实时）','');
+      });}
+    });
+  };
+
+  function renderAll(){
+    document.querySelectorAll('.loc-bar').forEach(function(bar){
+      var ap=bar.getAttribute('data-airport');
+      bar.querySelector('.loc-btn').style.display='none';
+      var box=bar.querySelector('.loc-result');
+      box.style.display='block';
+      var rows=__loc.rows.slice().sort(function(a,b){return (a.dur==null?9e9:a.dur)-(b.dur==null?9e9:b.dur);});
+      var h='<div class="loc-pos">📍 当前位置：'+__loc.addr+' <span class="loc-acc">（定位精度 ±'+__loc.acc+' 米）</span></div>';
+      h+='<div class="loc-sub">🚗 驾车前往各机场（高德实时路况）：</div>';
+      rows.forEach(function(r,i){
+        var a=AIRPORTS[r.code];
+        var cls=r.code===ap?'loc-row mine':(i===0?'loc-row best':'loc-row');
+        var tag=r.code===ap?'<em>本页机场</em>':(i===0?'<em>⭐ 最近</em>':'');
+        var info=r.dist!=null?fmtKm(r.dist)+' · '+fmtDur(r.dur)+(r.cost?' · 打车约¥'+r.cost:''):'路线查询失败';
+        h+='<div class="'+cls+'"><span>'+a.name+'机场'+tag+'</span><span>'+info+'</span></div>';
+      });
+      h+='<button type="button" class="loc-rebtn" onclick="resetLoc()">🔄 重新定位</button>';
+      box.innerHTML=h;
+      var mine=__loc.rows.filter(function(r){return r.code===ap;})[0];
+      var card=bar.parentNode.querySelectorAll('.transport-card')[0];
+      if(card&&mine&&mine.dist!=null){
+        var ss=card.querySelectorAll('.transport-info strong');
+        if(ss[0])ss[0].textContent=fmtKm(mine.dist)+'（实时）';
+        if(ss[1])ss[1].textContent=fmtDur(mine.dur)+'（实时路况）';
+        if(ss[2]&&mine.cost)ss[2].textContent='¥'+mine.cost+'（实时预估）';
+      }
+    });
+  }
+})();
+</script>
+<script>
+(function(){
+  function syncBoomSections(){
+    document.querySelectorAll('#tab-boomerang .boomerang-routes').forEach(function(box){
+      var title=box.previousElementSibling;
+      var has=box.querySelectorAll('.boomerang-card').length>0;
+      box.style.display=has?'':'none';
+      if(title&&title.tagName==='H3')title.style.display=has?'':'none';
+    });
+  }
+  if(document.readyState!=='loading'){syncBoomSections();}
+  else{document.addEventListener('DOMContentLoaded',syncBoomSections);}
+})();
+</script>
+<script>
+// Boomerang segment detail data
+var BOOM_SEGMENTS = {
+  "CZX": [
+    {flight:"KY3224", from:"CZX", to:"KMG", route:"常州→昆明", price:"¥678"},
+    {flight:"CZ2120", from:"KMG", to:"CKG", route:"昆明→重庆", price:"¥330"},
+    {flight:"3U8097", from:"CKG", to:"CZX", route:"重庆→常州", price:"¥420"}
+  ],
+  "WUX": [
+    {flight:"AQ1056", from:"WUX", to:"CAN", route:"无锡→广州", price:"¥489"},
+    {flight:"CZ9098", from:"CAN", to:"CKG", route:"广州→重庆", price:"¥550"},
+    {flight:"9C6154", from:"CKG", to:"PVG", route:"重庆→浦东", price:"¥515"}
+  ],
+  "SHA": [
+    {flight:"9C8953", from:"SHA", to:"KMG", route:"虹桥→昆明", price:"¥299"},
+    {flight:"CZ2120", from:"KMG", to:"CKG", route:"昆明→重庆", price:"¥330"},
+    {flight:"3U8097", from:"CKG", to:"CZX", route:"重庆→常州", price:"¥420"}
+  ],
+  "PVG": [
+    {flight:"AQ1006", from:"PVG", to:"CAN", route:"浦东→广州", price:"¥280"},
+    {flight:"CZ9098", from:"CAN", to:"CKG", route:"广州→重庆", price:"¥550"},
+    {flight:"9C6154", from:"CKG", to:"PVG", route:"重庆→浦东", price:"¥515"}
+  ],
+  "T2_1": [
+    {flight:"9C8835", from:"SHA", to:"CAN", route:"虹桥→广州", price:"¥700"},
+    {flight:"AQ1055", from:"CAN", to:"WUX", route:"广州→无锡", price:"¥439"}
+  ],
+  "T2_2": [
+    {flight:"AQ1006", from:"PVG", to:"CAN", route:"浦东→广州", price:"¥280"},
+    {flight:"9C6722", from:"CAN", to:"SHA", route:"广州→虹桥", price:"¥469"}
+  ],
+  "T2_3": [
+    {flight:"AQ1056", from:"WUX", to:"CAN", route:"无锡→广州", price:"¥489"},
+    {flight:"9C6722", from:"CAN", to:"SHA", route:"广州→虹桥", price:"¥469"}
+  ]
+};
+
+var BOOM_FLIGHT_DATA = {"CAN-CKG": {"airline": "中国南方航空", "dep_time": "06:55", "arr_time": "09:05", "aircraft": "空客A320", "on_time_rate": "81%", "checkin_counter": "D24-D32 (E/F区)", "checkin_gate": "动态分配", "dep_terminal": "T2", "arr_terminal": "T3", "flight_no": "CZ9098", "frequency": "每日"}, "CAN-SHA": {"airline": "春秋航空", "dep_time": "06:45", "arr_time": "09:10", "aircraft": "空客A321", "on_time_rate": "43%", "checkin_counter": "T3 E岛", "checkin_gate": "动态分配", "dep_terminal": "T3", "arr_terminal": "T1", "flight_no": "9C6722", "frequency": "周二/四/六"}, "CAN-WUX": {"airline": "九元航空", "dep_time": "06:20", "arr_time": "08:40", "aircraft": "波音737MAX", "on_time_rate": "100%", "checkin_counter": "F20-F34", "checkin_gate": "B41", "dep_terminal": "T2", "arr_terminal": "T2", "flight_no": "AQ1055", "frequency": "每日"}, "CKG-CZX": {"airline": "四川航空", "dep_time": "06:50", "arr_time": "08:55", "aircraft": "空客A320", "on_time_rate": "97%", "checkin_counter": "3D111-3D123", "checkin_gate": "L5", "dep_terminal": "T3", "arr_terminal": "主航站楼", "flight_no": "3U8097", "frequency": "每日"}, "CKG-PVG": {"airline": "春秋航空", "dep_time": "05:40", "arr_time": "08:10", "aircraft": "空客A320neo", "on_time_rate": "100%", "checkin_counter": "3J268-3J270", "checkin_gate": "动态分配", "dep_terminal": "T3", "arr_terminal": "T2", "flight_no": "9C6154", "frequency": "每日"}, "KMG-CKG": {"airline": "中国南方航空", "dep_time": "22:05", "arr_time": "23:50", "aircraft": "空客A320", "on_time_rate": "77%", "checkin_counter": "C13-C15, D01-D08", "checkin_gate": "47/59", "dep_terminal": "T1", "arr_terminal": "T3", "flight_no": "CZ2120", "frequency": "每日"}, "KMG-SHA": {"airline": "中国东方航空", "dep_time": "08:00", "arr_time": "10:55", "aircraft": "波音737MAX", "on_time_rate": "97%", "checkin_counter": "F岛/G岛", "checkin_gate": "29/30", "dep_terminal": "T1", "arr_terminal": "T2", "flight_no": "MU5801", "frequency": "每日"}, "PVG-CAN": {"airline": "九元航空", "dep_time": "23:10", "arr_time": "01:35+1", "aircraft": "波音737-800/MAX8", "on_time_rate": "85%", "checkin_counter": "J岛/K岛", "checkin_gate": "动态分配", "dep_terminal": "T2", "arr_terminal": "T2", "flight_no": "AQ1006", "frequency": "每日"}, "SHA-CAN": {"airline": "春秋航空", "dep_time": "07:15", "arr_time": "09:40", "aircraft": "空客A321", "on_time_rate": "97%", "checkin_counter": "D08-D24", "checkin_gate": "T16/T23", "dep_terminal": "T1", "arr_terminal": "T3", "flight_no": "9C8835", "frequency": "每日"}, "WUX-CAN": {"airline": "九元航空", "dep_time": "16:20", "arr_time": "19:00", "aircraft": "波音737MAX8", "on_time_rate": "90%", "checkin_counter": "A岛/B岛", "checkin_gate": "动态分配", "dep_terminal": "T2", "arr_terminal": "T2", "flight_no": "AQ1056", "frequency": "每日"}, "CZX-KMG": {"airline": "昆明航空", "dep_time": "20:40", "arr_time": "23:40", "aircraft": "波音738", "on_time_rate": "80%", "checkin_counter": "9-28", "checkin_gate": "2号门", "dep_terminal": "主航站楼", "arr_terminal": "T1", "flight_no": "KY3224", "frequency": "每日"}, "SHA-KMG": {"airline": "春秋航空", "dep_time": "07:45", "arr_time": "10:55", "aircraft": "空客A320", "on_time_rate": "—", "checkin_counter": "T1 3号门", "checkin_gate": "动态分配", "dep_terminal": "T1", "arr_terminal": "T1", "flight_no": "9C8953", "frequency": "每日"}};
+
+var AIRPORT_NAMES = {
+  "CZX": "常州奔牛", "WUX": "无锡硕放", "SHA": "上海虹桥", "PVG": "上海浦东",
+  "KMG": "昆明长水", "CAN": "广州白云", "CKG": "重庆江北",
+  "DLC": "大连周水子", "SHE": "沈阳桃仙", "HAK": "海口美兰", "SYX": "三亚凤凰",
+  "CTU": "成都双流", "XIY": "西安咸阳", "CGO": "郑州新郑",
+  "TSN": "天津滨海", "HRB": "哈尔滨太平", "KWL": "桂林两江", "KWE": "贵阳龙洞堡",
+  "MFM": "澳门", "HKG": "香港", "TPE": "台北桃园",
+  "ICN": "首尔仁川", "NRT": "东京成田", "HND": "东京羽田", "KIX": "大阪关西",
+  "BKK": "曼谷素万那普", "SIN": "新加坡樟宜", "KUL": "吉隆坡",
+  "SGN": "胡志明市", "HAN": "河内", "CNX": "清迈",
+  "MLE": "马累", "CMB": "科伦坡", "DXB": "迪拜",
+  "LHR": "伦敦希思罗", "CDG": "巴黎戴高乐", "FRA": "法兰克福",
+  "JFK": "纽约肯尼迪", "LAX": "洛杉矶", "SFO": "旧金山",
+  "SYD": "悉尼", "AKL": "奥克兰",
+  "YYZ": "多伦多", "YVR": "温哥华"
+};
+function getAirportName(code) { return AIRPORT_NAMES[code] || code; }
+
+function openSegmentDetail(el, evt) {
+  if (evt) evt.stopPropagation();
+  var card = el.getAttribute('data-card');
+  var segIdx = parseInt(el.getAttribute('data-seg'));
+  var segs = BOOM_SEGMENTS[card];
+  if (!segs || !segs[segIdx]) return;
+  var seg = segs[segIdx];
+  var modal = document.getElementById('flightModal');
+  
+  var detailEl = document.getElementById('detail-' + seg.from + '-' + seg.to);
+  var suppInfo = BOOM_FLIGHT_DATA[seg.from + '-' + seg.to];
+  var data = {
+    flightNo: seg.flight, airline: '', depTime: '', arrTime: '',
+    aircraft: '', onTime: '', checkinCounter: '', checkinGate: '',
+    frequency: '每日'
+  };
+  
+  var foundInDetail = false;
+  if (detailEl) {
+    var table = detailEl.querySelector('table');
+    if (table) {
+      var rows = table.querySelectorAll('tr');
+      for (var r = 1; r < rows.length; r++) {
+        var cells = rows[r].querySelectorAll('td');
+        if (cells.length > 0 && cells[0].textContent.trim() === seg.flight) {
+          data.airline = cells[1] ? cells[1].textContent.trim() : '';
+          data.depTime = cells[2] ? cells[2].textContent.trim() : '';
+          data.arrTime = cells[3] ? cells[3].textContent.trim() : '';
+          data.aircraft = cells[4] ? cells[4].textContent.trim() : '';
+          data.onTime = cells[5] ? cells[5].textContent.trim() : '';
+          data.checkinCounter = cells[6] ? cells[6].textContent.trim() : '';
+          data.checkinGate = cells[7] ? cells[7].textContent.trim() : '';
+          foundInDetail = true;
+          break;
+        }
+      }
+    }
+  }
+  if (!foundInDetail && suppInfo) {
+    data.airline = suppInfo.airline || '';
+    data.depTime = suppInfo.dep_time || '';
+    data.arrTime = suppInfo.arr_time || '';
+    data.aircraft = suppInfo.aircraft || '';
+    data.onTime = suppInfo.on_time_rate || '';
+    data.checkinCounter = suppInfo.checkin_counter || '';
+    data.checkinGate = suppInfo.checkin_gate || '';
+    if (suppInfo.frequency) data.frequency = suppInfo.frequency;
+  }
+  
+  var depName = getAirportName(seg.from);
+  var arrName = getAirportName(seg.to);
+  var duration = '';
+  if (data.depTime && data.arrTime && data.depTime.length >= 5 && data.arrTime.length >= 5) {
+    var dh = parseInt(data.depTime.substring(0,2)), dm = parseInt(data.depTime.substring(3,5));
+    var ah = parseInt(data.arrTime.substring(0,2)), am = parseInt(data.arrTime.substring(3,5));
+    var diff = (ah*60+am) - (dh*60+dm);
+    if (diff < 0) diff += 1440;
+    duration = Math.floor(diff/60) + 'h' + (diff%60<10?'0':'') + (diff%60) + 'm';
+  }
+  
+  function dash(v){return v?v:'—'}
+  
+  var html = '';
+  html += '<div style="text-align:center;margin-bottom:20px">';
+  html += '<span style="display:inline-block;background:#b8860b;color:#fff;padding:8px 24px;border-radius:20px;font-weight:600;font-size:1.1em">';
+  html += '第' + (segIdx+1) + '程 · ' + seg.price;
+  html += '</span></div>';
+  
+  var kvRows = [
+    {label:'航班号', value: data.flightNo},
+    {label:'班期', value: data.frequency},
+    {label:'航司', value: data.airline},
+    {label:'出发', value: depName + ' ' + seg.from + (data.depTime ? ' ' + data.depTime : '')},
+    {label:'到达', value: arrName + ' ' + seg.to + (data.arrTime ? ' ' + data.arrTime : '')},
+    {label:'飞行时长', value: duration + (suppInfo && suppInfo.stopover ? ' (' + suppInfo.stopover + ')' : '')},
+    {label:'机型', value: data.aircraft},
+    {label:'准点率', value: data.onTime},
+    {label:'值机柜台', value: data.checkinCounter},
+    {label:'值机门', value: data.checkinGate}
+  ];
+  
+  html += '<div style="padding:0 4px">';
+  for (var i = 0; i < kvRows.length; i++) {
+    html += '<div style="display:flex;align-items:baseline;padding:8px 0">';
+    html += '<div style="flex:0 0 100px;color:#607d8b;font-size:1.1em">' + kvRows[i].label + '</div>';
+    html += '<div style="flex:1;font-weight:600;font-size:1.35em;color:#1a1a2e">' + dash(kvRows[i].value) + '</div>';
+    html += '</div>';
+  }
+  html += '</div>';
+  
+  html += '<div style="margin-top:12px;padding-top:12px;border-top:1px dashed #b0bec5;color:#607d8b;font-size:0.95em">';
+  html += '💡 价格为2026年9月10日TripNow最低含税价；中转段值机信息以当日航司公布为准';
+  html += '</div>';
+  
+  html += '<div style="margin-top:16px;padding:14px;background:var(--bg-secondary,#f5f5f5);border-radius:10px">';
+  html += '<div style="font-weight:600;margin-bottom:10px;font-size:0.95em">全程航段</div>';
+  for (var i = 0; i < segs.length; i++) {
+    var s = segs[i];
+    var hl = (i === segIdx) ? 'background:#b8860b20;color:var(--gold,#b8860b);border:1px solid #b8860b40' : '';
+    html += '<span style="display:inline-block;padding:4px 10px;margin:3px 4px 3px 0;border-radius:6px;font-size:0.9em;' + hl + '">';
+    var segFreq = '每日';
+    var fkey = s.from + '-' + s.to;
+    if (BOOM_FLIGHT_DATA[fkey] && BOOM_FLIGHT_DATA[fkey].frequency) segFreq = BOOM_FLIGHT_DATA[fkey].frequency;
+    var freqBadge = (segFreq !== '每日') ? ' <span style="font-size:0.75em;padding:1px 5px;border-radius:6px;background:#fff3e0;color:#e65100;margin-left:4px">' + segFreq + '</span>' : '';
+    html += (i+1) + '. ' + s.flight + ' ' + s.route + ' <b>' + s.price + '</b>' + freqBadge;
+    html += '</span>';
+  }
+  html += '</div>';
+  
+  document.getElementById('modalTitle').innerHTML = seg.flight + ' <small>' + seg.route + '</small>';
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalFooter').innerHTML = '<a href="https://www.fliggy.com/" target="_blank" rel="noopener noreferrer" class="btn-book">去飞猪购票 🛫</a>';
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+</script>
+</body>
+</html>
